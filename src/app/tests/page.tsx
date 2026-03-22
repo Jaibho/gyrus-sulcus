@@ -1,13 +1,14 @@
 'use client'
-import { Suspense, useEffect, useState, useCallback } from 'react'
+import { Suspense, useEffect, useState, useCallback, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
 import {
   Microscope, Scale, BarChart3, Globe, Newspaper,
   Clock, ArrowRight, ArrowLeft, CheckCircle, XCircle,
-  Trophy, RotateCcw, Home
+  Trophy, RotateCcw, Home, CalendarDays
 } from 'lucide-react'
+import DailyCalendar, { generateFullAvailability } from '@/components/DailyCalendar'
 
 const subjects = [
   { key: 'science_tech', icon: Microscope, hi: 'विज्ञान एवं प्रौद्योगिकी', en: 'Science & Technology', color: 'border-blue-200 hover:border-blue-400', iconColor: 'text-blue-600 bg-blue-50' },
@@ -241,38 +242,122 @@ const questionBank: Record<string, Question[]> = {
 
 const QUIZ_DURATION = 10 * 60 // 10 minutes in seconds
 
+function todayISO() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+const HI_MONTHS_SHORT = ['जन','फर','मार्च','अप्रैल','मई','जून','जुलाई','अग','सित','अक्त','नव','दिस']
+const EN_MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+function friendlyDate(dateStr: string, lang: string) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const months = lang === 'hi' ? HI_MONTHS_SHORT : EN_MONTHS_SHORT
+  return lang === 'hi' ? `${d} ${months[m - 1]} ${y}` : `${d} ${months[m - 1]} ${y}`
+}
+
 function SubjectList() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
+  const [selectedDate, setSelectedDate] = useState(todayISO)
+  const availableDates = useMemo(() => generateFullAvailability(), [])
+
+  const todayStr = todayISO()
+  const dayData = availableDates.find(d => d.date === selectedDate)
+  const quizAvailable = !!dayData?.hasQuiz
+  const isToday = selectedDate === todayStr
+  const isFuture = selectedDate > todayStr
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold text-gray-900 mb-2">
         {t('सभी उपलब्ध टेस्ट', 'All Available Tests')}
       </h1>
-      <p className="text-gray-500 mb-8">
+      <p className="text-gray-500 mb-6">
         {t('हर विषय में 5 प्रश्न, 10 मिनट का समय', 'Each subject has 5 questions, 10 minutes time')}
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {subjects.map((sub) => (
-          <Link
-            key={sub.key}
-            href={`/tests?subject=${sub.key}`}
-            className={`flex items-center gap-4 p-5 bg-white rounded-xl border-2 ${sub.color} hover:shadow-lg transition-all group`}
-          >
-            <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 ${sub.iconColor}`}>
-              <sub.icon size={26} />
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Calendar sidebar */}
+        <div className="lg:w-64 shrink-0 space-y-3">
+          <div className="flex items-center gap-2 mb-1">
+            <CalendarDays size={16} className="text-brand-500" />
+            <span className="text-sm font-bold text-gray-700">{t('दिनांक चुनें', 'Choose Date')}</span>
+          </div>
+
+          <DailyCalendar
+            mode="quiz"
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+            availableDates={availableDates}
+          />
+
+          {/* Status card */}
+          <div className={`rounded-xl p-3 text-sm font-medium border ${
+            isFuture
+              ? 'bg-gray-50 border-gray-200 text-gray-400'
+              : quizAvailable
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+              : 'bg-rose-50 border-rose-200 text-rose-600'
+          }`}>
+            <p className="font-bold mb-0.5">
+              {friendlyDate(selectedDate, lang)} {t('का क्विज़', 'Quiz')}
+            </p>
+            {isFuture
+              ? t('यह तारीख अभी नहीं आई', 'This date is in the future')
+              : quizAvailable
+              ? t('✅ क्विज़ उपलब्ध है — विषय चुनें', '✅ Quiz available — pick a subject')
+              : t('❌ इस दिन का क्विज़ उपलब्ध नहीं है', '❌ No quiz available for this day')}
+          </div>
+        </div>
+
+        {/* Subject cards */}
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-4">
+            {isToday
+              ? <span className="text-sm font-semibold text-gray-700">{t('आज के टेस्ट', "Today's Tests")}</span>
+              : <span className="text-sm font-semibold text-gray-700">
+                  {friendlyDate(selectedDate, lang)} {t('के टेस्ट', 'Tests')}
+                </span>
+            }
+          </div>
+
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 transition-opacity ${(!quizAvailable && !isFuture) ? 'opacity-40 pointer-events-none' : ''}`}>
+            {subjects.map((sub) => (
+              <Link
+                key={sub.key}
+                href={`/tests?subject=${sub.key}`}
+                className={`flex items-center gap-4 p-5 bg-white rounded-xl border-2 ${sub.color} hover:shadow-lg transition-all group`}
+              >
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 ${sub.iconColor}`}>
+                  <sub.icon size={26} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-gray-900 text-lg">{t(sub.hi, sub.en)}</h3>
+                  <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                    <span>5 {t('प्रश्न', 'Questions')}</span>
+                    <span className="flex items-center gap-1"><Clock size={13} /> 10 {t('मिनट', 'mins')}</span>
+                  </div>
+                </div>
+                <span className="text-brand-500 font-semibold text-sm flex items-center gap-1 shrink-0">
+                  {t('शुरू करें', 'Start')} <ArrowRight size={16} />
+                </span>
+              </Link>
+            ))}
+          </div>
+
+          {!quizAvailable && !isFuture && (
+            <div className="mt-6 text-center py-10 text-gray-400">
+              <CalendarDays size={40} className="mx-auto mb-3 opacity-30" />
+              <p className="text-sm">{t('इस दिन के लिए कोई क्विज़ नहीं है।', 'No quiz found for this day.')}</p>
+              <button
+                onClick={() => setSelectedDate(todayStr)}
+                className="mt-3 text-brand-500 text-sm font-semibold hover:underline"
+              >
+                {t('आज के टेस्ट देखें', "View today's tests")}
+              </button>
             </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-gray-900 text-lg">{t(sub.hi, sub.en)}</h3>
-              <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
-                <span>5 {t('प्रश्न', 'Questions')}</span>
-                <span className="flex items-center gap-1"><Clock size={13} /> 10 {t('मिनट', 'mins')}</span>
-              </div>
-            </div>
-            <span className="text-brand-500 font-semibold text-sm flex items-center gap-1 shrink-0">
-              {t('शुरू करें', 'Start')} <ArrowRight size={16} />
-            </span>
-          </Link>
-        ))}
+          )}
+        </div>
       </div>
     </div>
   )
