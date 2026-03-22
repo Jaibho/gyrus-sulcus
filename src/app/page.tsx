@@ -85,8 +85,8 @@ export default function HomePage() {
       <section className="max-w-4xl mx-auto text-center px-4 py-10">
         <p className="text-gray-600 text-lg leading-relaxed">
           {t(
-            'UPSC, NEET और State PCS की तैयारी के लिए आपका दैनिक साथी। गुणवत्तापूर्ण MCQs और लेखों के साथ निरंतरता बनाएं।',
-            'Your daily companion for UPSC, NEET and State PCS preparation. Build consistency with quality MCQs and articles.'
+            'UPSC, IAS, RAS और State PCS की तैयारी के लिए आपका दैनिक साथी। गुणवत्तापूर्ण MCQs और लेखों के साथ निरंतरता बनाएं।',
+            'Your daily companion for UPSC, IAS, RAS and State PCS preparation. Build consistency with quality MCQs and articles.'
           )}
         </p>
       </section>
