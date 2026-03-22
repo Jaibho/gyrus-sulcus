@@ -7,7 +7,6 @@ import {
   CheckCircle, Languages, Smartphone, FileDown, ArrowRight,
   Play, Flame, Radio, Phone
 } from 'lucide-react'
-
 const subjects = [
   { key: 'science_tech', icon: Microscope, hi: 'विज्ञान एवं प्रौद्योगिकी', en: 'Science & Technology', color: 'bg-blue-50 text-blue-600 border-blue-200' },
   { key: 'polity', icon: Scale, hi: 'भारतीय राजव्यवस्था', en: 'Indian Polity', color: 'bg-amber-50 text-amber-600 border-amber-200' },
@@ -67,7 +66,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center gap-8 relative z-10">
           <div className="md:w-1/3 flex justify-center">
             <div className="w-56 h-56 md:w-72 md:h-72 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
-              <Image src="/profile.jpg" alt="Dharmendra Sir" width={288} height={288} className="w-full h-full object-cover" priority />
+              <Image src="/logo.jpg" alt="Dharmendra Sir" width={288} height={288} className="w-full h-full object-cover" priority />
             </div>
           </div>
           <div className="md:w-2/3 text-center md:text-left">
