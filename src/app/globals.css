@@ -7,4 +7,17 @@
 body {
   font-family: 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
   background-color: #f8f9fa;
+  /* Disable text selection sitewide */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Re-enable selection inside form controls */
+input, textarea, select, [contenteditable] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
