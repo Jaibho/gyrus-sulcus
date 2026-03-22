@@ -1,12 +1,15 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Dancing_Script } from 'next/font/google'
 import { useLanguage } from '@/lib/LanguageContext'
 import {
   Microscope, Scale, BarChart3, Globe, Newspaper,
   CheckCircle, Languages, Smartphone, FileDown, ArrowRight,
   Play, Flame, Radio, Phone
 } from 'lucide-react'
+
+const dancingScript = Dancing_Script({ subsets: ['latin'], weight: ['700'] })
 const subjects = [
   { key: 'science_tech', icon: Microscope, hi: 'विज्ञान एवं प्रौद्योगिकी', en: 'Science & Technology', color: 'bg-blue-50 text-blue-600 border-blue-200' },
   { key: 'polity', icon: Scale, hi: 'भारतीय राजव्यवस्था', en: 'Indian Polity', color: 'bg-amber-50 text-amber-600 border-amber-200' },
@@ -59,7 +62,7 @@ export default function HomePage() {
     <>
       {/* Hero Section */}
       <section className="overflow-hidden">
-        <div className="w-full">
+        <div className="relative w-full">
           <Image
             src="/banner.jpg"
             alt="Gyrus Sulcus — I know that I don't know"
@@ -68,6 +71,22 @@ export default function HomePage() {
             className="w-full h-auto object-cover"
             priority
           />
+          {/* Handwritten signature overlay */}
+          <div
+            className={`${dancingScript.className} absolute`}
+            style={{
+              bottom: '9%',
+              right: '5%',
+              fontSize: 'clamp(22px, 3vw, 36px)',
+              color: 'rgba(255, 235, 180, 0.92)',
+              textShadow: '0 1px 6px rgba(0,0,0,0.45)',
+              lineHeight: 1,
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }}
+          >
+            — Dharmendra Sir
+          </div>
         </div>
         <div className="bg-gradient-to-r from-brand-600 to-brand-800 py-5">
           <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row gap-3 justify-center items-center">
