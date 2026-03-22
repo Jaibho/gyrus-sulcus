@@ -37,6 +37,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="hi">
       <body>
         <ClientLayout>{children}</ClientLayout>
+        <a
+          href="/"
+          style={{
+            position: 'fixed',
+            bottom: '16px',
+            left: '16px',
+            zIndex: 9999,
+            display: 'block',
+            width: '56px',
+            height: '56px',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.20)',
+          }}
+          aria-label="Gyrus Sulcus Home"
+        >
+          <img src="/logo.jpg" alt="Gyrus Sulcus" width={56} height={56} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        </a>
       </body>
     </html>
   )
