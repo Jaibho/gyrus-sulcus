@@ -1,13 +1,22 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import { Dancing_Script } from 'next/font/google'
 import { useLanguage } from '@/lib/LanguageContext'
 import {
   Microscope, Scale, BarChart3, Globe, Newspaper,
   CheckCircle, Languages, Smartphone, FileDown, ArrowRight,
-  Play, Flame, Radio, Phone
+  Play, Flame, Radio, Phone, Users, MessageCircle, BookOpen, FileText, Clock
 } from 'lucide-react'
+
+function getSecondsUntil8AM() {
+  const now = new Date()
+  const next8AM = new Date()
+  next8AM.setHours(8, 0, 0, 0)
+  if (now >= next8AM) next8AM.setDate(next8AM.getDate() + 1)
+  return Math.floor((next8AM.getTime() - now.getTime()) / 1000)
+}
 
 const dancingScript = Dancing_Script({ subsets: ['latin'], weight: ['700'] })
 const subjects = [
@@ -55,8 +64,25 @@ const features = [
   { icon: FileDown, hi: 'PDF नोट्स डाउनलोड', en: 'PDF Notes Download', descHi: 'हस्तलिखित नोट्स और संकलन PDF में डाउनलोड करें — ऑफ़लाइन पढ़ाई के लिए।', descEn: 'Download handwritten notes and compilations in PDF — for offline study.' },
 ]
 
+const stats = [
+  { icon: Users, num: '13L+', hi: 'YouTube Subscribers', en: 'YouTube Subscribers' },
+  { icon: MessageCircle, num: '14K+', hi: 'Telegram Members', en: 'Telegram Members' },
+  { icon: BookOpen, num: '1000+', hi: 'दैनिक MCQs', en: 'Daily MCQs' },
+  { icon: FileText, num: '500+', hi: 'लेख', en: 'Articles' },
+]
+
 export default function HomePage() {
   const { t } = useLanguage()
+  const [countdown, setCountdown] = useState(getSecondsUntil8AM())
+
+  useEffect(() => {
+    const id = setInterval(() => setCountdown(getSecondsUntil8AM()), 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  const ch = Math.floor(countdown / 3600).toString().padStart(2, '0')
+  const cm = Math.floor((countdown % 3600) / 60).toString().padStart(2, '0')
+  const cs = (countdown % 60).toString().padStart(2, '0')
 
   return (
     <>
@@ -112,6 +138,15 @@ export default function HomePage() {
 
       {/* Today's Tests */}
       <section className="max-w-7xl mx-auto px-4 pb-12">
+        {/* Daily quiz hook */}
+        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-5">
+          <span className="text-lg">🔥</span>
+          <div className="flex-1">
+            <span className="font-bold text-amber-800 text-sm">{t('हर दिन नया क्विज़!', 'New Quiz Every Day!')}</span>
+            <span className="text-amber-600 text-xs ml-2">{t('अगला क्विज़:', 'Next quiz:')} <span className="font-mono font-semibold">{ch}:{cm}:{cs}</span></span>
+          </div>
+          <Clock size={16} className="text-amber-500 shrink-0" />
+        </div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">{t('आज के टेस्ट', 'Today\'s Tests')}</h2>
           <Link href="/tests" className="text-brand-500 font-medium text-sm flex items-center gap-1 hover:underline">
@@ -131,6 +166,24 @@ export default function HomePage() {
               </span>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Social Proof Stats */}
+      <section className="bg-gradient-to-r from-brand-600 to-brand-800 py-12 mb-0">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-white text-center mb-8">{t('13 लाख+ छात्रों का भरोसा', '13 Lakh+ Students Trust Us')}</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {stats.map((stat, i) => (
+              <div key={i} className="text-center">
+                <div className="w-12 h-12 mx-auto bg-white/15 rounded-xl flex items-center justify-center mb-3">
+                  <stat.icon size={24} className="text-white" />
+                </div>
+                <div className="text-3xl font-extrabold text-white mb-1">{stat.num}</div>
+                <div className="text-blue-200 text-sm">{t(stat.hi, stat.en)}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

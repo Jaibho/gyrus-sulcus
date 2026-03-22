@@ -337,6 +337,18 @@ function QuizView() {
           <p className="text-sm text-gray-400">{t(subjectMeta.hi, subjectMeta.en)}</p>
         </div>
 
+        {/* Daily quiz CTA */}
+        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6">
+          <span className="text-xl">🕐</span>
+          <div className="flex-1">
+            <p className="font-bold text-amber-800 text-sm">{t('अगला क्विज़ कल सुबह 8 बजे', 'Next quiz tomorrow at 8 AM')}</p>
+            <p className="text-amber-600 text-xs">{t('Telegram पर रिमाइंडर पाएं', 'Get reminder on Telegram')}</p>
+          </div>
+          <a href="https://t.me/gyrussulcus7597647088" target="_blank" rel="noopener noreferrer" className="shrink-0 px-3 py-1.5 bg-amber-500 text-white text-xs font-semibold rounded-lg hover:bg-amber-600 transition-colors">
+            {t('रिमाइंडर सेट करें', 'Set Reminder')}
+          </a>
+        </div>
+
         {/* Answer Review */}
         <h3 className="text-lg font-bold text-gray-900 mb-4">{t('विस्तृत समीक्षा', 'Detailed Review')}</h3>
         <div className="flex flex-col gap-4 mb-8">
