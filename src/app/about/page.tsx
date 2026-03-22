@@ -22,8 +22,8 @@ export default function AboutPage() {
           <p className="text-brand-500 font-medium mt-1">Founder — Gyrus Sulcus</p>
           <p className="text-gray-600 mt-3 leading-relaxed">
             {t(
-              'B.Pharmacy graduate, educator और content creator। 1.1 Million+ subscribers के साथ YouTube पर UPSC, NEET, RAS, LDC की तैयारी करवाते हैं। "I know that I don\'t know" — यही हमारी philosophy है। सीखना कभी नहीं रुकता।',
-              'B.Pharmacy graduate, educator and content creator. Teaching UPSC, NEET, RAS, LDC preparation on YouTube with 1.1 Million+ subscribers. "I know that I don\'t know" — this is our philosophy. Learning never stops.'
+              'B.Pharmacy graduate, educator और content creator। 1.1 Million+ subscribers के साथ YouTube पर UPSC, IAS, RAS, LDC की तैयारी करवाते हैं। "I know that I don\'t know" — यही हमारी philosophy है। सीखना कभी नहीं रुकता।',
+              'B.Pharmacy graduate, educator and content creator. Teaching UPSC, IAS, RAS, LDC preparation on YouTube with 1.1 Million+ subscribers. "I know that I don\'t know" — this is our philosophy. Learning never stops.'
             )}
           </p>
           <div className="flex gap-3 mt-4">
