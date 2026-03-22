@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useLanguage } from '@/lib/LanguageContext'
 import {
   Home, ClipboardList, BookOpen, GraduationCap, FileText,
-  Search, User, Menu, X
+  Search, User, Menu, X, Library
 } from 'lucide-react'
 
 export default function Navbar() {
@@ -20,6 +20,7 @@ export default function Navbar() {
     { href: '/articles', label: t('लेख', 'Articles'), icon: BookOpen },
     { href: '/courses', label: t('कोर्स', 'Courses'), icon: GraduationCap },
     { href: '/notes', label: t('नोट्स', 'Notes'), icon: FileText },
+    { href: '/resources', label: t('संसाधन', 'Resources'), icon: Library },
   ]
 
   return (
