@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useLanguage } from '@/lib/LanguageContext'
 import {
   Home, ClipboardList, BookOpen, GraduationCap, FileText,
-  Search, User, Menu, X, Library
+  Search, User, Menu, X, Library, ShoppingCart
 } from 'lucide-react'
 
 export default function Navbar() {
@@ -49,6 +49,13 @@ export default function Navbar() {
       iconCls: 'text-indigo-500',
       baseCls: 'text-indigo-700 hover:bg-indigo-50 hover:text-indigo-700',
       mobileCls: 'text-indigo-700 hover:bg-indigo-50',
+    },
+    {
+      href: '/store', label: t('स्टोर', 'Store'), icon: ShoppingCart,
+      iconCls: 'text-amber-500',
+      baseCls: 'text-amber-700 hover:bg-amber-50 hover:text-amber-700 ring-1 ring-amber-300 bg-amber-50',
+      mobileCls: 'text-amber-700 hover:bg-amber-50 bg-amber-50',
+      special: true,
     },
   ]
 

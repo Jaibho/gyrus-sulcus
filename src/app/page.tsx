@@ -7,7 +7,8 @@ import { useLanguage } from '@/lib/LanguageContext'
 import {
   Microscope, Scale, BarChart3, Globe, Newspaper,
   CheckCircle, Languages, Smartphone, FileDown, ArrowRight,
-  Play, Flame, Radio, Phone, Users, MessageCircle, BookOpen, FileText, Clock
+  Play, Flame, Radio, Phone, Users, MessageCircle, BookOpen, FileText, Clock,
+  ShoppingCart, Pen, BookMarked, Archive, Tag, GraduationCap
 } from 'lucide-react'
 
 function getSecondsUntil8AM() {
@@ -62,6 +63,20 @@ const features = [
   { icon: Languages, hi: 'द्विभाषी सामग्री', en: 'Bilingual Content', descHi: 'हिंदी और English दोनों माध्यमों में उत्कृष्ट गुणवत्ता वाली अध्ययन सामग्री उपलब्ध।', descEn: 'High quality study material available in both Hindi and English.' },
   { icon: Smartphone, hi: 'सभी डिवाइस पर अनुकूल', en: 'All Device Friendly', descHi: 'फ़ोन, टैबलेट या लैपटॉप — कहीं भी और कभी भी अध्ययन करें बिना किसी रुकावट के।', descEn: 'Phone, tablet or laptop — study anywhere, anytime without interruption.' },
   { icon: FileDown, hi: 'PDF नोट्स डाउनलोड', en: 'PDF Notes Download', descHi: 'हस्तलिखित नोट्स और संकलन PDF में डाउनलोड करें — ऑफ़लाइन पढ़ाई के लिए।', descEn: 'Download handwritten notes and compilations in PDF — for offline study.' },
+]
+
+const studyItems = [
+  { icon: Pen,         emoji: '✍️', hi: 'हस्तलिखित नोट्स',           en: 'Handwritten Notes',          price: '₹199', descHi: 'टॉपर्स की शैली में',        descEn: 'Topper-style notes' },
+  { icon: BookOpen,    emoji: '📗', hi: 'किताबें',                     en: 'Books',                      price: '₹349', descHi: 'Dharmendra Sir द्वारा',     descEn: 'By Dharmendra Sir' },
+  { icon: BookMarked,  emoji: '📒', hi: 'बुकलेट्स',                    en: 'Booklets',                   price: '₹99',  descHi: 'विषय-केंद्रित संकलन',       descEn: 'Topic-focused digests' },
+  { icon: Archive,     emoji: '📁', hi: 'PYQ संकलन',                   en: 'PYQ Compilations',           price: '₹249', descHi: '2025 तक के प्रश्न',         descEn: 'Questions up to 2025' },
+]
+const merchItems = [
+  { emoji: '🧢', hi: 'टोपी (Cap)',        en: 'Cap',          price: '₹299', descHi: 'Gyrus Sulcus लोगो के साथ',   descEn: 'With Gyrus Sulcus logo' },
+  { emoji: '👕', hi: 'टी-शर्ट',           en: 'T-Shirt',      price: '₹499', descHi: 'प्रेरक उद्धरण के साथ',       descEn: 'With motivational quote' },
+  { emoji: '☂️', hi: 'छाता',              en: 'Umbrella',     price: '₹599', descHi: 'हर मौसम के लिए',             descEn: 'For every season' },
+  { emoji: '🖼️', hi: 'पोस्टर',            en: 'Poster',       price: '₹149', descHi: 'प्रेरक A3 पोस्टर',           descEn: 'Motivational A3 poster' },
+  { emoji: '☕', hi: 'कॉफी मग',           en: 'Coffee Mug',   price: '₹249', descHi: '"I know that I don\'t know"', descEn: '"I know that I don\'t know"' },
 ]
 
 const stats = [
@@ -215,6 +230,89 @@ export default function HomePage() {
               </div>
             </a>
           ))}
+        </div>
+      </section>
+
+      {/* ===== GYRUS SULCUS STORE ===== */}
+      <section style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 40%, #fde68a 70%, #fed7aa 100%)' }} className="py-14">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Heading */}
+          <div className="text-center mb-10">
+            <span className="inline-flex items-center gap-2 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
+              <ShoppingCart size={13} /> {t('नया', 'New')}
+            </span>
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
+              🛒 {t('Gyrus Sulcus स्टोर', 'Gyrus Sulcus Store')}
+            </h2>
+            <p className="text-gray-600 max-w-xl mx-auto text-sm">
+              {t('अध्ययन सामग्री और मर्चेंडाइज़ — सीधे Dharmendra Sir से', 'Study material & merchandise — directly from Dharmendra Sir')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Study Material */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-9 h-9 bg-brand-500 rounded-lg flex items-center justify-center">
+                  <GraduationCap size={18} className="text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">{t('📚 अध्ययन सामग्री', '📚 Study Material')}</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {studyItems.map((item, i) => (
+                  <div key={i} className="bg-white rounded-2xl p-4 shadow-sm border border-amber-100 hover:shadow-md hover:-translate-y-0.5 transition-all group flex flex-col gap-2">
+                    <div className="text-3xl">{item.emoji}</div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm leading-tight">{t(item.hi, item.en)}</h4>
+                      <p className="text-xs text-gray-400 mt-0.5">{t(item.descHi, item.descEn)}</p>
+                    </div>
+                    <div className="flex items-center justify-between mt-auto pt-2">
+                      <span className="text-brand-600 font-extrabold text-base">{item.price}</span>
+                      <a href="#" className="text-xs font-semibold bg-brand-500 text-white px-3 py-1.5 rounded-lg hover:bg-brand-600 transition-colors flex items-center gap-1">
+                        <Tag size={11} /> {t('खरीदें', 'Buy Now')}
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Merchandise */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-9 h-9 bg-amber-500 rounded-lg flex items-center justify-center">
+                  <ShoppingCart size={18} className="text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">{t('🎁 मर्चेंडाइज़', '🎁 Merchandise')}</h3>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+                {merchItems.map((item, i) => (
+                  <div key={i} className="bg-white rounded-2xl p-4 shadow-sm border border-amber-100 hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col gap-2">
+                    <div className="text-3xl">{item.emoji}</div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm leading-tight">{t(item.hi, item.en)}</h4>
+                      <p className="text-xs text-gray-400 mt-0.5">{t(item.descHi, item.descEn)}</p>
+                    </div>
+                    <div className="flex items-center justify-between mt-auto pt-2">
+                      <span className="text-amber-600 font-extrabold text-base">{item.price}</span>
+                      <a href="#" className="text-xs font-semibold bg-amber-500 text-white px-3 py-1.5 rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-1">
+                        <Tag size={11} /> {t('खरीदें', 'Buy')}
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-10">
+            <Link href="/store" className="inline-flex items-center gap-2 px-8 py-3.5 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-colors shadow-lg text-sm">
+              <ShoppingCart size={18} />
+              {t('पूरा स्टोर देखें', 'View Full Store')}
+              <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
 
