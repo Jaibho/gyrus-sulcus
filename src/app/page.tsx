@@ -85,7 +85,7 @@ export default function HomePage() {
               userSelect: 'none',
             }}
           >
-            — Dharmendra Sir
+            — Dharmendra
           </div>
         </div>
         <div className="bg-gradient-to-r from-brand-600 to-brand-800 py-5">
