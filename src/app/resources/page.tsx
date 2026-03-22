@@ -68,6 +68,49 @@ export default function ResourcesPage() {
         </p>
       </div>
 
+      {/* YouTube Playlists */}
+      <section className="mb-12">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
+            <Youtube size={22} className="text-red-500" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">{t('YouTube प्लेलिस्ट', 'YouTube Playlists')}</h2>
+            <p className="text-sm text-gray-500">{t('Gyrus Sulcus चैनल की विषयवार प्लेलिस्ट', 'Subject-wise playlists from Gyrus Sulcus channel')}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {youtubePlaylists.map((playlist, i) => (
+            <a
+              key={i}
+              href={playlist.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:shadow-md transition-all group"
+            >
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${playlist.color}`}>
+                <PlayCircle size={26} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-900 text-sm leading-snug">{t(playlist.hi, playlist.title)}</h3>
+                <p className="text-xs text-gray-400 mt-0.5">{playlist.views}</p>
+              </div>
+              <ExternalLink size={16} className="text-gray-300 group-hover:text-brand-500 transition-colors shrink-0" />
+            </a>
+          ))}
+        </div>
+        <div className="mt-4 text-center">
+          <a
+            href="https://www.youtube.com/@gyrussulcus1908"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors shadow-sm"
+          >
+            <Youtube size={20} /> {t('पूरा चैनल देखें', 'Visit Full Channel')} <ArrowRight size={16} />
+          </a>
+        </div>
+      </section>
+
       {/* NCERT Books */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-5">
@@ -179,49 +222,6 @@ export default function ResourcesPage() {
               <p className="text-xs text-gray-400 mt-2">{book.author}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* YouTube Playlists */}
-      <section className="mb-12">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
-            <Youtube size={22} className="text-red-500" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">{t('YouTube प्लेलिस्ट', 'YouTube Playlists')}</h2>
-            <p className="text-sm text-gray-500">{t('Gyrus Sulcus चैनल की विषयवार प्लेलिस्ट', 'Subject-wise playlists from Gyrus Sulcus channel')}</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {youtubePlaylists.map((playlist, i) => (
-            <a
-              key={i}
-              href={playlist.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:shadow-md transition-all group"
-            >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${playlist.color}`}>
-                <PlayCircle size={26} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 text-sm leading-snug">{t(playlist.hi, playlist.title)}</h3>
-                <p className="text-xs text-gray-400 mt-0.5">{playlist.views}</p>
-              </div>
-              <ExternalLink size={16} className="text-gray-300 group-hover:text-brand-500 transition-colors shrink-0" />
-            </a>
-          ))}
-        </div>
-        <div className="mt-4 text-center">
-          <a
-            href="https://www.youtube.com/@gyrussulcus1908"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors shadow-sm"
-          >
-            <Youtube size={20} /> {t('पूरा चैनल देखें', 'Visit Full Channel')} <ArrowRight size={16} />
-          </a>
         </div>
       </section>
 

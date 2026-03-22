@@ -58,31 +58,25 @@ export default function HomePage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-brand-500 via-brand-600 to-brand-800 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-72 h-72 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-48 h-48 bg-blue-300 rounded-full blur-3xl" />
+      <section className="overflow-hidden">
+        <div className="w-full">
+          <Image
+            src="/banner.jpg"
+            alt="Gyrus Sulcus — I know that I don't know"
+            width={1200}
+            height={400}
+            className="w-full h-auto object-cover"
+            priority
+          />
         </div>
-        <div className="max-w-7xl mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center gap-8 relative z-10">
-          <div className="md:w-1/3 flex justify-center">
-            <div className="w-56 h-56 md:w-72 md:h-72 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
-              <Image src="/logo.jpg" alt="Dharmendra Sir" width={288} height={288} className="w-full h-full object-cover" priority />
-            </div>
-          </div>
-          <div className="md:w-2/3 text-center md:text-left">
-            <div className="text-blue-200 text-lg mb-2">&ldquo;</div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">I know that<br />I don&apos;t know</h1>
-            <div className="text-blue-200 text-lg mt-1">&rdquo;</div>
-            <p className="text-xl md:text-2xl font-semibold mt-4">GYRUS SULCUS</p>
-            <p className="text-blue-200 mt-1">Knowledge begins with curiosity</p>
-            <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center md:justify-start">
-              <Link href="/tests" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-brand-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors shadow-lg">
-                {t('आज का टेस्ट दें', 'Take Today\'s Test')} <ArrowRight size={18} />
-              </Link>
-              <Link href="/articles" className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors">
-                {t('लेख पढ़ें', 'Read Articles')}
-              </Link>
-            </div>
+        <div className="bg-gradient-to-r from-brand-600 to-brand-800 py-5">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <Link href="/tests" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-brand-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors shadow-lg">
+              {t('आज का टेस्ट दें', 'Take Today\'s Test')} <ArrowRight size={18} />
+            </Link>
+            <Link href="/articles" className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors">
+              {t('लेख पढ़ें', 'Read Articles')}
+            </Link>
           </div>
         </div>
       </section>
