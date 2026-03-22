@@ -14,7 +14,7 @@ export default function AboutPage() {
 
       {/* Profile Section */}
       <div className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8 flex flex-col md:flex-row gap-6 items-center mb-10">
-        <div className="w-40 h-40 rounded-2xl overflow-hidden shrink-0 shadow-lg">
+        <div classNamelogow-40 h-40 rounded-2xl overflow-hidden shrink-0 shadow-lg">
           <Image src="/profile.jpg" alt="Dharmendra Sir" width={160} height={160} className="w-full h-full object-cover" />
         </div>
         <div>
