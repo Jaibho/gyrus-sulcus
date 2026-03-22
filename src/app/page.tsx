@@ -1,0 +1,191 @@
+'use client'
+import Link from 'next/link'
+import Image from 'next/image'
+import { useLanguage } from '@/lib/LanguageContext'
+import {
+  Microscope, Scale, BarChart3, Globe, Newspaper,
+  CheckCircle, Languages, Smartphone, FileDown, ArrowRight,
+  Play, Flame, Radio, Phone
+} from 'lucide-react'
+
+const subjects = [
+  { key: 'science_tech', icon: Microscope, hi: 'विज्ञान एवं प्रौद्योगिकी', en: 'Science & Technology', color: 'bg-blue-50 text-blue-600 border-blue-200' },
+  { key: 'polity', icon: Scale, hi: 'भारतीय राजव्यवस्था', en: 'Indian Polity', color: 'bg-amber-50 text-amber-600 border-amber-200' },
+  { key: 'economy', icon: BarChart3, hi: 'अर्थव्यवस्था', en: 'Economy', color: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
+  { key: 'geography', icon: Globe, hi: 'भूगोल एवं पर्यावरण', en: 'Geography & Environment', color: 'bg-purple-50 text-purple-600 border-purple-200' },
+  { key: 'current_affairs', icon: Newspaper, hi: 'समसामयिकी', en: 'Current Affairs', color: 'bg-rose-50 text-rose-600 border-rose-200' },
+]
+
+const youtubeVideos = [
+  {
+    id: 'jAiba2Di260',
+    titleHi: 'Critical Thinking — सबसे लोकप्रिय',
+    titleEn: 'Critical Thinking — Most Popular',
+    views: '1.4M+ views',
+    icon: Flame,
+    badge: 'Most Popular',
+    badgeColor: 'bg-red-500',
+  },
+  {
+    id: 'X8qBR8u5178',
+    titleHi: 'MASTER CLASS — Science & Technology',
+    titleEn: 'MASTER CLASS — Science & Technology',
+    views: '100K+ views',
+    icon: Radio,
+    badge: 'Live Class',
+    badgeColor: 'bg-purple-500',
+  },
+  {
+    id: 'AaVBjzPR9Jk',
+    titleHi: 'Why NATO is Silent on Iran?',
+    titleEn: 'Why NATO is Silent on Iran?',
+    views: '42K+ views',
+    icon: Play,
+    badge: 'Latest',
+    badgeColor: 'bg-brand-500',
+  },
+]
+
+const features = [
+  { icon: CheckCircle, hi: 'गुणवत्तापूर्ण MCQs', en: 'Quality MCQs', descHi: 'रोज़ 100+ नए, परीक्षा-केंद्रित प्रश्न जो आपको वास्तविक परीक्षा के लिए तैयार करते हैं।', descEn: 'Daily 100+ new, exam-focused questions that prepare you for the real exam.' },
+  { icon: Languages, hi: 'द्विभाषी सामग्री', en: 'Bilingual Content', descHi: 'हिंदी और English दोनों माध्यमों में उत्कृष्ट गुणवत्ता वाली अध्ययन सामग्री उपलब्ध।', descEn: 'High quality study material available in both Hindi and English.' },
+  { icon: Smartphone, hi: 'सभी डिवाइस पर अनुकूल', en: 'All Device Friendly', descHi: 'फ़ोन, टैबलेट या लैपटॉप — कहीं भी और कभी भी अध्ययन करें बिना किसी रुकावट के।', descEn: 'Phone, tablet or laptop — study anywhere, anytime without interruption.' },
+  { icon: FileDown, hi: 'PDF नोट्स डाउनलोड', en: 'PDF Notes Download', descHi: 'हस्तलिखित नोट्स और संकलन PDF में डाउनलोड करें — ऑफ़लाइन पढ़ाई के लिए।', descEn: 'Download handwritten notes and compilations in PDF — for offline study.' },
+]
+
+export default function HomePage() {
+  const { t } = useLanguage()
+
+  return (
+    <>
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-brand-500 via-brand-600 to-brand-800 text-white overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 right-10 w-72 h-72 bg-white rounded-full blur-3xl" />
+          <div className="absolute bottom-10 left-10 w-48 h-48 bg-blue-300 rounded-full blur-3xl" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center gap-8 relative z-10">
+          <div className="md:w-1/3 flex justify-center">
+            <div className="w-56 h-56 md:w-72 md:h-72 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
+              <Image src="/profile.jpg" alt="Dharmendra Sir" width={288} height={288} className="w-full h-full object-cover" priority />
+            </div>
+          </div>
+          <div className="md:w-2/3 text-center md:text-left">
+            <div className="text-blue-200 text-lg mb-2">&ldquo;</div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">I know that<br />I don&apos;t know</h1>
+            <div className="text-blue-200 text-lg mt-1">&rdquo;</div>
+            <p className="text-xl md:text-2xl font-semibold mt-4">GYRUS SULCUS</p>
+            <p className="text-blue-200 mt-1">Knowledge begins with curiosity</p>
+            <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center md:justify-start">
+              <Link href="/tests" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-brand-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors shadow-lg">
+                {t('आज का टेस्ट दें', 'Take Today\'s Test')} <ArrowRight size={18} />
+              </Link>
+              <Link href="/articles" className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors">
+                {t('लेख पढ़ें', 'Read Articles')}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Description */}
+      <section className="max-w-4xl mx-auto text-center px-4 py-10">
+        <p className="text-gray-600 text-lg leading-relaxed">
+          {t(
+            'UPSC, NEET और State PCS की तैयारी के लिए आपका दैनिक साथी। गुणवत्तापूर्ण MCQs और लेखों के साथ निरंतरता बनाएं।',
+            'Your daily companion for UPSC, NEET and State PCS preparation. Build consistency with quality MCQs and articles.'
+          )}
+        </p>
+      </section>
+
+      {/* Today's Tests */}
+      <section className="max-w-7xl mx-auto px-4 pb-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">{t('आज के टेस्ट', 'Today\'s Tests')}</h2>
+          <Link href="/tests" className="text-brand-500 font-medium text-sm flex items-center gap-1 hover:underline">
+            {t('सभी देखें', 'View All')} <ArrowRight size={14} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {subjects.map((sub) => (
+            <Link key={sub.key} href={`/tests?subject=${sub.key}`} className="flex items-center gap-4 p-4 rounded-xl border bg-white hover:shadow-md transition-all group">
+              <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${sub.color}`}><sub.icon size={22} /></div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900">{t(sub.hi, sub.en)}</h3>
+                <p className="text-sm text-gray-500">{t('5 प्रश्न', '5 Questions')}</p>
+              </div>
+              <span className="text-brand-500 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                {t('शुरू करें', 'Start')} <ArrowRight size={14} />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* YouTube Videos Section */}
+      <section className="max-w-7xl mx-auto px-4 pb-16">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">{t('YouTube से चुनिंदा वीडियो', 'Featured Videos from YouTube')}</h2>
+          <a href="https://www.youtube.com/@gyrussulcus1908" target="_blank" rel="noopener noreferrer" className="text-red-500 font-medium text-sm flex items-center gap-1 hover:underline">
+            {t('चैनल देखें', 'Visit Channel')} <ArrowRight size={14} />
+          </a>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {youtubeVideos.map((video) => (
+            <a key={video.id} href={`https://www.youtube.com/watch?v=${video.id}`} target="_blank" rel="noopener noreferrer" className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all group">
+              <div className="relative aspect-video bg-gray-900">
+                <img src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`} alt={video.titleEn} className="w-full h-full object-cover group-hover:opacity-90 transition-opacity" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <Play size={24} className="text-white ml-1" fill="white" />
+                  </div>
+                </div>
+                <span className={`absolute top-3 left-3 ${video.badgeColor} text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1`}>
+                  <video.icon size={12} /> {video.badge}
+                </span>
+              </div>
+              <div className="p-4">
+                <h3 className="font-bold text-gray-900 leading-snug group-hover:text-brand-500 transition-colors">{t(video.titleHi, video.titleEn)}</h3>
+                <p className="text-sm text-gray-500 mt-1">{video.views}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* WhatsApp Contact Bar */}
+      <section className="max-w-7xl mx-auto px-4 pb-12">
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+              <Phone size={22} className="text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900">{t('WhatsApp पर संपर्क करें', 'Contact on WhatsApp')}</h3>
+              <p className="text-sm text-gray-600">{t('किसी भी प्रश्न के लिए सीधे WhatsApp करें', 'WhatsApp us directly for any questions')}</p>
+            </div>
+          </div>
+          <a href="https://wa.me/917597647088" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white font-semibold rounded-xl hover:bg-green-600 transition-colors shadow-sm">
+            <Phone size={18} /> 7597647088
+          </a>
+        </div>
+      </section>
+
+      {/* Why Choose Us */}
+      <section className="bg-gray-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-10">{t('क्यों चुनें Gyrus Sulcus?', 'Why Choose Gyrus Sulcus?')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((f, i) => (
+              <div key={i} className="text-center p-6">
+                <div className="w-14 h-14 mx-auto bg-brand-500 rounded-xl flex items-center justify-center mb-4"><f.icon size={26} /></div>
+                <h3 className="font-bold text-lg mb-2">{t(f.hi, f.en)}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{t(f.descHi, f.descEn)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
