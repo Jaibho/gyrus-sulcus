@@ -1,11 +1,10 @@
 'use client'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useState } from 'react'
 import { useLanguage } from '@/lib/LanguageContext'
 import {
   Home, ClipboardList, BookOpen, GraduationCap, FileText,
-  Search, User, Menu, X, Library, Flame
+  Search, User, Menu, X, Library
 } from 'lucide-react'
 
 export default function Navbar() {
@@ -15,18 +14,49 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('')
 
   const navItems = [
-    { href: '/', label: t('होम', 'Home'), icon: Home },
-    { href: '/tests', label: t('टेस्ट', 'Tests'), icon: ClipboardList },
-    { href: '/articles', label: t('लेख', 'Articles'), icon: BookOpen },
-    { href: '/courses', label: t('कोर्स', 'Courses'), icon: GraduationCap },
-    { href: '/notes', label: t('नोट्स', 'Notes'), icon: FileText },
-    { href: '/resources', label: t('संसाधन', 'Resources'), icon: Library },
+    {
+      href: '/', label: t('होम', 'Home'), icon: Home,
+      iconCls: 'text-blue-500',
+      baseCls: 'text-blue-700 hover:bg-blue-50 hover:text-blue-700',
+      mobileCls: 'text-blue-700 hover:bg-blue-50',
+    },
+    {
+      href: '/tests', label: t('टेस्ट', 'Tests'), icon: ClipboardList,
+      iconCls: 'text-emerald-500',
+      baseCls: 'text-emerald-700 hover:bg-emerald-50 hover:text-emerald-700',
+      mobileCls: 'text-emerald-700 hover:bg-emerald-50',
+    },
+    {
+      href: '/articles', label: t('लेख', 'Articles'), icon: BookOpen,
+      iconCls: 'text-purple-500',
+      baseCls: 'text-purple-700 hover:bg-purple-50 hover:text-purple-700',
+      mobileCls: 'text-purple-700 hover:bg-purple-50',
+    },
+    {
+      href: '/courses', label: t('कोर्स', 'Courses'), icon: GraduationCap,
+      iconCls: 'text-teal-500',
+      baseCls: 'text-teal-700 hover:bg-teal-50 hover:text-teal-700',
+      mobileCls: 'text-teal-700 hover:bg-teal-50',
+    },
+    {
+      href: '/notes', label: t('नोट्स', 'Notes'), icon: FileText,
+      iconCls: 'text-amber-500',
+      baseCls: 'text-amber-700 hover:bg-amber-50 hover:text-amber-700',
+      mobileCls: 'text-amber-700 hover:bg-amber-50',
+    },
+    {
+      href: '/resources', label: t('संसाधन', 'Resources'), icon: Library,
+      iconCls: 'text-indigo-500',
+      baseCls: 'text-indigo-700 hover:bg-indigo-50 hover:text-indigo-700',
+      mobileCls: 'text-indigo-700 hover:bg-indigo-50',
+    },
   ]
 
   return (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
+
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="w-9 h-9 bg-brand-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
@@ -38,25 +68,17 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-0.5">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition-colors"
+                className={`flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg transition-colors ${item.baseCls}`}
               >
-                <item.icon size={16} />
+                <item.icon size={15} className={item.iconCls} />
                 {item.label}
               </Link>
             ))}
-            <Link
-              href="/ras-english"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-white rounded-full transition-all hover:scale-105 hover:shadow-lg"
-              style={{ background: 'linear-gradient(135deg, #f97316, #ef4444)' }}
-            >
-              <Flame size={14} />
-              RAS English
-            </Link>
           </div>
 
           {/* Right: Search + Lang + Login */}
@@ -139,21 +161,12 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-2 px-3 py-2.5 text-gray-600 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition-colors"
+                className={`flex items-center gap-2.5 px-3 py-2.5 font-semibold rounded-lg transition-colors ${item.mobileCls}`}
               >
-                <item.icon size={18} />
-                <span className="font-medium">{item.label}</span>
+                <item.icon size={18} className={item.iconCls} />
+                <span>{item.label}</span>
               </Link>
             ))}
-            <Link
-              href="/ras-english"
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-bold mt-1"
-              style={{ background: 'linear-gradient(135deg, #f97316, #ef4444)' }}
-            >
-              <Flame size={18} />
-              <span>RAS English Medium</span>
-            </Link>
           </div>
         )}
       </div>
