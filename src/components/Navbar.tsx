@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useLanguage } from '@/lib/LanguageContext'
 import {
   Home, ClipboardList, BookOpen, GraduationCap, FileText,
-  Search, User, Menu, X, Library
+  Search, User, Menu, X, Library, Flame
 } from 'lucide-react'
 
 export default function Navbar() {
@@ -49,6 +49,14 @@ export default function Navbar() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href="/ras-english"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-white rounded-full transition-all hover:scale-105 hover:shadow-lg"
+              style={{ background: 'linear-gradient(135deg, #f97316, #ef4444)' }}
+            >
+              <Flame size={14} />
+              RAS English
+            </Link>
           </div>
 
           {/* Right: Search + Lang + Login */}
@@ -137,6 +145,15 @@ export default function Navbar() {
                 <span className="font-medium">{item.label}</span>
               </Link>
             ))}
+            <Link
+              href="/ras-english"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-bold mt-1"
+              style={{ background: 'linear-gradient(135deg, #f97316, #ef4444)' }}
+            >
+              <Flame size={18} />
+              <span>RAS English Medium</span>
+            </Link>
           </div>
         )}
       </div>
