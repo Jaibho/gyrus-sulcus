@@ -2,7 +2,7 @@
 import { useLanguage } from '@/lib/LanguageContext'
 import {
   BookOpen, Download, Youtube, ExternalLink, FileText,
-  GraduationCap, Library, PlayCircle, ArrowRight
+  GraduationCap, Library, PlayCircle, ArrowRight, Star
 } from 'lucide-react'
 
 const ncertBooks = [
@@ -16,32 +16,29 @@ const ncertBooks = [
 ]
 
 const pyqPapers = [
-  { year: '2023', exam: 'UPSC CSE Prelims', hi: 'यूपीएससी प्रारंभिक परीक्षा 2023', url: 'https://upsc.gov.in/sites/default/files/QP-CSP-23-GS-P-I-04062023.pdf', badge: 'Latest', badgeColor: 'bg-brand-500' },
-  { year: '2022', exam: 'UPSC CSE Prelims', hi: 'यूपीएससी प्रारंभिक परीक्षा 2022', url: 'https://upsc.gov.in/sites/default/files/QP-CSP-22-GS-P-I-05062022.pdf', badge: '2022', badgeColor: 'bg-blue-500' },
-  { year: '2021', exam: 'UPSC CSE Prelims', hi: 'यूपीएससी प्रारंभिक परीक्षा 2021', url: 'https://upsc.gov.in/sites/default/files/QP-CSP-2021-GS-P-I-10102021.pdf', badge: '2021', badgeColor: 'bg-gray-500' },
-  { year: '2023', exam: 'UPSC CSE Mains GS-1', hi: 'यूपीएससी मुख्य परीक्षा GS-1 2023', url: 'https://upsc.gov.in/sites/default/files/QP-CSM-23-GS-Paper-I.pdf', badge: 'Mains', badgeColor: 'bg-amber-500' },
-  { year: '2023', exam: 'UPSC CSE Mains GS-2', hi: 'यूपीएससी मुख्य परीक्षा GS-2 2023', url: 'https://upsc.gov.in/sites/default/files/QP-CSM-23-GS-Paper-II.pdf', badge: 'Mains', badgeColor: 'bg-amber-500' },
-  { year: '2023', exam: 'UPSC CSE Mains GS-3', hi: 'यूपीएससी मुख्य परीक्षा GS-3 2023', url: 'https://upsc.gov.in/sites/default/files/QP-CSM-23-GS-Paper-III.pdf', badge: 'Mains', badgeColor: 'bg-amber-500' },
+  { year: '2025', exam: 'UPSC CSE Prelims 2025', hi: 'यूपीएससी प्रारंभिक परीक्षा 2025', url: 'https://upsc.gov.in/examinations/exam-notices', badge: 'Latest', badgeColor: 'bg-brand-500' },
+  { year: '2024', exam: 'UPSC CSE Prelims 2024', hi: 'यूपीएससी प्रारंभिक परीक्षा 2024', url: 'https://upsc.gov.in/sites/default/files/QP-CSP-24-GS-P-I-26052024.pdf', badge: '2024', badgeColor: 'bg-blue-500' },
+  { year: '2023', exam: 'UPSC CSE Prelims 2023', hi: 'यूपीएससी प्रारंभिक परीक्षा 2023', url: 'https://upsc.gov.in/sites/default/files/QP-CSP-23-GS-P-I-04062023.pdf', badge: '2023', badgeColor: 'bg-gray-500' },
+  { year: '2025', exam: 'UPSC CSE Mains GS-1 2025', hi: 'यूपीएससी मुख्य परीक्षा GS-1 2025', url: 'https://upsc.gov.in/examinations/exam-notices', badge: 'Mains', badgeColor: 'bg-amber-500' },
+  { year: '2025', exam: 'UPSC CSE Mains GS-2 2025', hi: 'यूपीएससी मुख्य परीक्षा GS-2 2025', url: 'https://upsc.gov.in/examinations/exam-notices', badge: 'Mains', badgeColor: 'bg-amber-500' },
+  { year: '2025', exam: 'UPSC CSE Mains GS-3 2025', hi: 'यूपीएससी मुख्य परीक्षा GS-3 2025', url: 'https://upsc.gov.in/examinations/exam-notices', badge: 'Mains', badgeColor: 'bg-amber-500' },
 ]
 
 const recommendedBooks = [
-  { title: 'Indian Polity', author: 'M. Laxmikanth', hi: 'भारतीय राजव्यवस्था', subject: 'Polity', color: 'bg-amber-50 text-amber-700' },
-  { title: 'Certificate Physical & Human Geography', author: 'G.C. Leong', hi: 'भौतिक भूगोल', subject: 'Geography', color: 'bg-purple-50 text-purple-700' },
-  { title: 'Indian Economy', author: 'Ramesh Singh', hi: 'भारतीय अर्थव्यवस्था', subject: 'Economy', color: 'bg-emerald-50 text-emerald-700' },
-  { title: 'History of Modern India', author: 'Bipan Chandra', hi: 'आधुनिक भारत का इतिहास', subject: 'History', color: 'bg-rose-50 text-rose-700' },
-  { title: 'Science & Technology', author: 'Ravi P. Agarwal', hi: 'विज्ञान एवं प्रौद्योगिकी', subject: 'Science', color: 'bg-blue-50 text-blue-700' },
-  { title: 'India Year Book', author: 'Publications Division', hi: 'भारत वर्ष पुस्तक', subject: 'Current Affairs', color: 'bg-indigo-50 text-indigo-700' },
-  { title: 'Environment & Ecology', author: 'Majid Husain', hi: 'पर्यावरण एवं पारिस्थितिकी', subject: 'Environment', color: 'bg-green-50 text-green-700' },
-  { title: 'Ancient & Medieval India', author: 'Poonam Dalal Dahiya', hi: 'प्राचीन एवं मध्यकालीन भारत', subject: 'History', color: 'bg-rose-50 text-rose-700' },
+  { title: 'Science & Technology by Dharmendra Sir', author: 'Dharmendra Sir', hi: 'विज्ञान एवं प्रौद्योगिकी — धर्मेन्द्र सर', subject: 'Science', color: 'bg-blue-50 text-blue-700', featured: true },
+  { title: 'Indian Polity', author: 'M. Laxmikanth', hi: 'भारतीय राजव्यवस्था', subject: 'Polity', color: 'bg-amber-50 text-amber-700', featured: false },
+  { title: 'Certificate Physical & Human Geography', author: 'G.C. Leong', hi: 'भौतिक भूगोल', subject: 'Geography', color: 'bg-purple-50 text-purple-700', featured: false },
+  { title: 'Indian Economy', author: 'Ramesh Singh', hi: 'भारतीय अर्थव्यवस्था', subject: 'Economy', color: 'bg-emerald-50 text-emerald-700', featured: false },
+  { title: 'History of Modern India', author: 'Bipan Chandra', hi: 'आधुनिक भारत का इतिहास', subject: 'History', color: 'bg-rose-50 text-rose-700', featured: false },
+  { title: 'India Year Book', author: 'Publications Division', hi: 'भारत वर्ष पुस्तक', subject: 'Current Affairs', color: 'bg-indigo-50 text-indigo-700', featured: false },
+  { title: 'Environment & Ecology', author: 'Majid Husain', hi: 'पर्यावरण एवं पारिस्थितिकी', subject: 'Environment', color: 'bg-green-50 text-green-700', featured: false },
+  { title: 'Ancient & Medieval India', author: 'Poonam Dalal Dahiya', hi: 'प्राचीन एवं मध्यकालीन भारत', subject: 'History', color: 'bg-rose-50 text-rose-700', featured: false },
 ]
 
-const youtubePlaylists = [
-  { title: 'Science & Technology Series', hi: 'विज्ञान एवं प्रौद्योगिकी सीरीज', views: '500K+ views', url: 'https://www.youtube.com/@gyrussulcus1908', color: 'text-blue-600 bg-blue-50' },
-  { title: 'Indian Polity Complete', hi: 'भारतीय राजव्यवस्था संपूर्ण', views: '300K+ views', url: 'https://www.youtube.com/@gyrussulcus1908', color: 'text-amber-600 bg-amber-50' },
-  { title: 'Economy for UPSC', hi: 'यूपीएससी के लिए अर्थव्यवस्था', views: '250K+ views', url: 'https://www.youtube.com/@gyrussulcus1908', color: 'text-emerald-600 bg-emerald-50' },
-  { title: 'Geography & Environment', hi: 'भूगोल एवं पर्यावरण', views: '200K+ views', url: 'https://www.youtube.com/@gyrussulcus1908', color: 'text-purple-600 bg-purple-50' },
-  { title: 'Current Affairs Daily', hi: 'दैनिक समसामयिकी', views: '1M+ views', url: 'https://www.youtube.com/@gyrussulcus1908', color: 'text-rose-600 bg-rose-50' },
-  { title: 'Critical Thinking Series', hi: 'क्रिटिकल थिंकिंग सीरीज', views: '1.4M+ views', url: 'https://www.youtube.com/watch?v=jAiba2Di260', color: 'text-red-600 bg-red-50' },
+const featuredVideos = [
+  { id: 'jAiba2Di260', titleHi: 'Critical Thinking — सबसे लोकप्रिय', titleEn: 'Critical Thinking — Most Popular', views: '1.4M+ views', badge: 'Most Popular', badgeColor: 'bg-red-500' },
+  { id: 'X8qBR8u5178', titleHi: 'MASTER CLASS — Science & Technology', titleEn: 'MASTER CLASS — Science & Technology', views: '100K+ views', badge: 'Master Class', badgeColor: 'bg-purple-500' },
+  { id: 'AaVBjzPR9Jk', titleHi: 'Why NATO is Silent on Iran?', titleEn: 'Why NATO is Silent on Iran?', views: '42K+ views', badge: 'Latest', badgeColor: 'bg-brand-500' },
 ]
 
 const freeResources = [
@@ -68,45 +65,68 @@ export default function ResourcesPage() {
         </p>
       </div>
 
-      {/* YouTube Playlists */}
+      {/* YouTube Videos */}
       <section className="mb-12">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
-            <Youtube size={22} className="text-red-500" />
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
+              <Youtube size={22} className="text-red-500" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">{t('YouTube वीडियो', 'YouTube Videos')}</h2>
+              <p className="text-sm text-gray-500">{t('Gyrus Sulcus चैनल के चुनिंदा वीडियो', 'Featured videos from Gyrus Sulcus channel')}</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">{t('YouTube प्लेलिस्ट', 'YouTube Playlists')}</h2>
-            <p className="text-sm text-gray-500">{t('Gyrus Sulcus चैनल की विषयवार प्लेलिस्ट', 'Subject-wise playlists from Gyrus Sulcus channel')}</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {youtubePlaylists.map((playlist, i) => (
-            <a
-              key={i}
-              href={playlist.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:shadow-md transition-all group"
-            >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${playlist.color}`}>
-                <PlayCircle size={26} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 text-sm leading-snug">{t(playlist.hi, playlist.title)}</h3>
-                <p className="text-xs text-gray-400 mt-0.5">{playlist.views}</p>
-              </div>
-              <ExternalLink size={16} className="text-gray-300 group-hover:text-brand-500 transition-colors shrink-0" />
-            </a>
-          ))}
-        </div>
-        <div className="mt-4 text-center">
           <a
             href="https://www.youtube.com/@gyrussulcus1908"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors shadow-sm"
+            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-xl hover:bg-red-700 transition-colors"
           >
-            <Youtube size={20} /> {t('पूरा चैनल देखें', 'Visit Full Channel')} <ArrowRight size={16} />
+            <Youtube size={16} /> {t('चैनल देखें', 'Visit Channel')}
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {featuredVideos.map((video) => (
+            <a
+              key={video.id}
+              href={`https://www.youtube.com/watch?v=${video.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all group"
+            >
+              <div className="relative aspect-video bg-gray-900">
+                <img
+                  src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
+                  alt={video.titleEn}
+                  className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <PlayCircle size={22} className="text-white" />
+                  </div>
+                </div>
+                <span className={`absolute top-2 left-2 ${video.badgeColor} text-white text-xs px-2 py-0.5 rounded-full font-medium`}>
+                  {video.badge}
+                </span>
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-gray-900 text-sm leading-snug group-hover:text-red-600 transition-colors">{t(video.titleHi, video.titleEn)}</h3>
+                <p className="text-xs text-gray-400 mt-1">{video.views}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div className="mt-4 text-center sm:hidden">
+          <a
+            href="https://www.youtube.com/@gyrussulcus1908"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors"
+          >
+            <Youtube size={18} /> {t('पूरा चैनल देखें', 'Visit Full Channel')} <ArrowRight size={14} />
           </a>
         </div>
       </section>
@@ -211,15 +231,29 @@ export default function ResourcesPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {recommendedBooks.map((book, i) => (
-            <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-all flex flex-col">
-              <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-3">
-                <BookOpen size={20} className="text-gray-400" />
+            <div
+              key={i}
+              className={`rounded-xl p-4 hover:shadow-md transition-all flex flex-col ${
+                book.featured
+                  ? 'bg-blue-50 border-2 border-blue-300 ring-2 ring-blue-100'
+                  : 'bg-white border border-gray-100'
+              }`}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${book.featured ? 'bg-blue-100' : 'bg-gray-50'}`}>
+                  <BookOpen size={20} className={book.featured ? 'text-blue-600' : 'text-gray-400'} />
+                </div>
+                {book.featured && (
+                  <span className="flex items-center gap-1 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full font-semibold">
+                    <Star size={10} fill="white" /> {t('हमारी किताब', 'Our Book')}
+                  </span>
+                )}
               </div>
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium w-fit mb-2 ${book.color}`}>
                 {book.subject}
               </span>
-              <h3 className="font-bold text-gray-900 text-sm leading-snug flex-1">{t(book.hi, book.title)}</h3>
-              <p className="text-xs text-gray-400 mt-2">{book.author}</p>
+              <h3 className={`font-bold text-sm leading-snug flex-1 ${book.featured ? 'text-blue-900' : 'text-gray-900'}`}>{t(book.hi, book.title)}</h3>
+              <p className={`text-xs mt-2 ${book.featured ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>{book.author}</p>
             </div>
           ))}
         </div>
