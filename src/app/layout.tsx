@@ -60,6 +60,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Fixed social bar — right side, vertically centered */}
         <SocialBar />
+
+        {/* Global watermark — fixed, full-page, pointer-events none, z-index below logo/social */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9997,
+            pointerEvents: 'none',
+            backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180'%3E%3Ctext transform='rotate(-30 150 90)' x='10' y='100' font-family='Arial' font-size='22' font-weight='700' fill='%231e40af' opacity='0.045' letter-spacing='4'%3EGYRUS SULCUS%3C/text%3E%3C/svg%3E\")",
+            backgroundRepeat: 'repeat',
+          }}
+        />
+
+        {/* noscript fallback */}
+        <noscript>
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: '#1e3a8a', color: 'white', padding: '12px', textAlign: 'center', zIndex: 99999, fontSize: '14px' }}>
+            This site requires JavaScript to function properly. Please enable JavaScript in your browser.
+          </div>
+        </noscript>
       </body>
     </html>
   )
