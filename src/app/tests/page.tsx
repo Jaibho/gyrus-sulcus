@@ -248,9 +248,14 @@ function SubjectList() {
       <h1 className="text-3xl font-bold text-gray-900 mb-2">
         {t('सभी उपलब्ध टेस्ट', 'All Available Tests')}
       </h1>
-      <p className="text-gray-500 mb-8">
+      <p className="text-gray-500 mb-4">
         {t('हर विषय में 5 प्रश्न, 10 मिनट का समय', 'Each subject has 5 questions, 10 minutes time')}
       </p>
+
+      <div className="flex items-center gap-2 mb-8 px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700 font-medium">
+        📅 {t('डेली क्विज़ कैलेंडर — जल्द आ रहा है', 'Daily Quiz Calendar — coming soon')}
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {subjects.map((sub) => (
           <Link
