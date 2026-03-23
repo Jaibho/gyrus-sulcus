@@ -6,6 +6,12 @@ import { useLanguage } from '@/lib/LanguageContext'
 import { supabase, Article } from '@/lib/supabase'
 import { Calendar, ArrowRight, Loader2, BookOpen } from 'lucide-react'
 
+interface LocalArticle extends Article {
+  title_en?: string
+  excerpt_en?: string
+  content_en?: string
+}
+
 const categories = [
   { key: 'all', hi: 'सभी', en: 'All' },
   { key: 'विज्ञान', hi: 'विज्ञान', en: 'Science' },
@@ -17,7 +23,7 @@ const categories = [
 
 export default function ArticlesPage() {
   const { t } = useLanguage()
-  const [articles, setArticles] = useState<Article[]>([])
+  const [articles, setArticles] = useState<LocalArticle[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('all')
 
@@ -27,14 +33,45 @@ export default function ArticlesPage() {
 
   async function fetchArticles() {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('articles')
-      .select('*')
-      .eq('is_published', true)
-      .order('created_at', { ascending: false })
-      .limit(20)
 
-    if (!error && data) setArticles(data)
+    // Try JSON file first
+    let jsonArticles: LocalArticle[] = []
+    try {
+      const res = await fetch('/data/articles.json')
+      if (res.ok) {
+        jsonArticles = await res.json()
+      }
+    } catch {
+      // ignore
+    }
+
+    // Try Supabase
+    let supabaseArticles: LocalArticle[] = []
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
+        .limit(20)
+      if (!error && data) {
+        supabaseArticles = data
+      }
+    } catch {
+      // ignore
+    }
+
+    // Merge: JSON articles first, then Supabase (de-duplicate by id)
+    const seen = new Set<string>()
+    const merged: LocalArticle[] = []
+    for (const a of [...jsonArticles, ...supabaseArticles]) {
+      if (!seen.has(a.id)) {
+        seen.add(a.id)
+        merged.push(a)
+      }
+    }
+
+    setArticles(merged)
     setLoading(false)
   }
 
@@ -97,7 +134,7 @@ export default function ArticlesPage() {
                 {article.image_url ? (
                   <Image
                     src={article.image_url}
-                    alt={article.title}
+                    alt={t(article.title, article.title_en || article.title)}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -114,10 +151,12 @@ export default function ArticlesPage() {
               {/* Content */}
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 text-lg leading-snug line-clamp-2 group-hover:text-brand-500 transition-colors">
-                  {article.title}
+                  {t(article.title, article.title_en || article.title)}
                 </h3>
-                {article.excerpt && (
-                  <p className="text-gray-500 text-sm mt-2 line-clamp-2">{article.excerpt}</p>
+                {(article.excerpt || article.excerpt_en) && (
+                  <p className="text-gray-500 text-sm mt-2 line-clamp-2">
+                    {t(article.excerpt || '', article.excerpt_en || article.excerpt || '')}
+                  </p>
                 )}
                 <div className="flex items-center justify-between mt-4">
                   <span className="text-xs text-gray-400 flex items-center gap-1">
