@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 
-const DAYS_HI = ['रवि', 'सोम', 'मंगल', 'बुध', 'गुरु', 'शुक्र', 'शनि']
-const MONTHS_HI = ['जनवरी', 'फ़रवरी', 'मार्च', 'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर']
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 function isWeekday(date: Date) {
   const d = date.getDay()
@@ -35,11 +35,11 @@ export default function DailyCalendar() {
     const d = new Date(year, month, day)
     const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear()
     if (isToday) {
-      setMessage('आज का क्विज़ उपलब्ध है! किसी भी विषय पर क्लिक करके शुरू करें।')
+      setMessage("Today's quiz is available! Click any topic to get started.")
     } else if (isWeekday(d)) {
-      setMessage(`${day} ${MONTHS_HI[month]} का क्विज़ उपलब्ध था।`)
+      setMessage(`Quiz for ${MONTHS[month]} ${day} was available.`)
     } else {
-      setMessage('सप्ताहांत पर क्विज़ उपलब्ध नहीं है।')
+      setMessage('No quiz available on weekends.')
     }
   }
 
@@ -52,14 +52,14 @@ export default function DailyCalendar() {
       <div className="flex items-center justify-between mb-3">
         <button onClick={prevMonth} className="p-1 rounded hover:bg-gray-100 text-gray-600">&#8249;</button>
         <span className="font-semibold text-gray-800 text-sm">
-          {MONTHS_HI[month]} {year}
+          {MONTHS[month]} {year}
         </span>
         <button onClick={nextMonth} className="p-1 rounded hover:bg-gray-100 text-gray-600">&#8250;</button>
       </div>
 
       {/* Day headers */}
       <div className="grid grid-cols-7 mb-1">
-        {DAYS_HI.map(d => (
+        {DAYS.map(d => (
           <div key={d} className="text-center text-xs text-gray-400 font-medium py-1">{d}</div>
         ))}
       </div>
