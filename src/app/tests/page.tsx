@@ -8,6 +8,7 @@ import {
   Clock, ArrowRight, ArrowLeft, CheckCircle, XCircle,
   Trophy, RotateCcw, Home
 } from 'lucide-react'
+import DailyCalendar from '@/components/DailyCalendar'
 
 const subjects = [
   { key: 'science_tech', icon: Microscope, hi: 'विज्ञान एवं प्रौद्योगिकी', en: 'Science & Technology', color: 'border-blue-200 hover:border-blue-400', iconColor: 'text-blue-600 bg-blue-50' },
@@ -251,6 +252,7 @@ function SubjectList() {
       <p className="text-gray-500 mb-8">
         {t('हर विषय में 5 प्रश्न, 10 मिनट का समय', 'Each subject has 5 questions, 10 minutes time')}
       </p>
+      <DailyCalendar mode="quiz" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {subjects.map((sub) => (
           <Link

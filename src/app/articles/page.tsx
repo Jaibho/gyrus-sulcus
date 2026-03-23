@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useLanguage } from '@/lib/LanguageContext'
 import { supabase, Article } from '@/lib/supabase'
 import { Calendar, ArrowRight, Loader2, BookOpen } from 'lucide-react'
+import DailyCalendar from '@/components/DailyCalendar'
 
 const categories = [
   { key: 'all', hi: 'सभी', en: 'All' },
@@ -50,6 +51,8 @@ export default function ArticlesPage() {
       <p className="text-gray-500 mb-6">
         {t('गहन विश्लेषण और परीक्षा-उन्मुख अध्ययन सामग्री।', 'In-depth analysis and exam-oriented study material.')}
       </p>
+
+      <DailyCalendar mode="article" />
 
       {/* Category Filter */}
       <div className="flex flex-wrap gap-2 mb-8">
