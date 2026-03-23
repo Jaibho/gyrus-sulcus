@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
@@ -12,7 +12,9 @@ export interface Article {
   title_en?: string
   slug: string
   content: string
+  content_en?: string
   excerpt?: string
+  excerpt_en?: string
   category: string
   image_url?: string
   is_published: boolean

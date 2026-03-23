@@ -27,14 +27,31 @@ export default function ArticlesPage() {
 
   async function fetchArticles() {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('articles')
-      .select('*')
-      .eq('is_published', true)
-      .order('created_at', { ascending: false })
-      .limit(20)
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
+        .limit(20)
 
-    if (!error && data) setArticles(data)
+      if (!error && data && data.length > 0) {
+        setArticles(data)
+        setLoading(false)
+        return
+      }
+    } catch {
+      // fall through to JSON fallback
+    }
+
+    // Fallback: load from local JSON
+    try {
+      const res = await fetch('/data/articles.json')
+      const json = await res.json()
+      setArticles(json)
+    } catch {
+      setArticles([])
+    }
     setLoading(false)
   }
 
