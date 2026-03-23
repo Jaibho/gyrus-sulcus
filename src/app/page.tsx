@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { Dancing_Script } from 'next/font/google'
 import { useLanguage } from '@/lib/LanguageContext'
+import VisitorCounter from '@/components/VisitorCounter'
 import {
   Microscope, Scale, BarChart3, Globe, Newspaper,
   CheckCircle, Languages, Smartphone, FileDown, ArrowRight,
@@ -199,6 +200,7 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+          <VisitorCounter />
         </div>
       </section>
 
