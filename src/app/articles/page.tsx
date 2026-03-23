@@ -6,20 +6,10 @@ import { useLanguage } from '@/lib/LanguageContext'
 import { supabase, Article } from '@/lib/supabase'
 import { Calendar, ArrowRight, Loader2, BookOpen } from 'lucide-react'
 
-const categories = [
-  { key: 'all', hi: 'सभी', en: 'All' },
-  { key: 'विज्ञान', hi: 'विज्ञान', en: 'Science' },
-  { key: 'राजव्यवस्था', hi: 'राजव्यवस्था', en: 'Polity' },
-  { key: 'अर्थव्यवस्था', hi: 'अर्थव्यवस्था', en: 'Economy' },
-  { key: 'भूगोल', hi: 'भूगोल', en: 'Geography' },
-  { key: 'समसामयिकी', hi: 'समसामयिकी', en: 'Current Affairs' },
-]
-
 export default function ArticlesPage() {
   const { t } = useLanguage()
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeCategory, setActiveCategory] = useState('all')
 
   useEffect(() => {
     fetchArticles()
@@ -55,10 +45,6 @@ export default function ArticlesPage() {
     setLoading(false)
   }
 
-  const filtered = activeCategory === 'all'
-    ? articles
-    : articles.filter(a => a.category === activeCategory)
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold text-gray-900 mb-1">
@@ -68,26 +54,7 @@ export default function ArticlesPage() {
         {t('गहन विश्लेषण और परीक्षा-उन्मुख अध्ययन सामग्री।', 'In-depth analysis and exam-oriented study material.')}
       </p>
 
-      <div className="flex items-center gap-2 mb-6 px-4 py-2.5 bg-brand-50 border border-brand-200 rounded-xl text-sm text-brand-700 font-medium">
-        📅 {t('तारीख से फ़िल्टर — जल्द आ रहा है', 'Filter by date — coming soon')}
-      </div>
-
-      {/* Category Filter */}
-      <div className="flex flex-wrap gap-2 mb-8">
-        {categories.map((cat) => (
-          <button
-            key={cat.key}
-            onClick={() => setActiveCategory(cat.key)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              activeCategory === cat.key
-                ? 'bg-brand-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {t(cat.hi, cat.en)}
-          </button>
-        ))}
-      </div>
+      <div className="mb-8" />
 
       {/* Loading */}
       {loading && (
@@ -98,16 +65,16 @@ export default function ArticlesPage() {
       )}
 
       {/* Articles Grid */}
-      {!loading && filtered.length === 0 && (
+      {!loading && articles.length === 0 && (
         <div className="text-center py-20 text-gray-400">
           <BookOpen size={48} className="mx-auto mb-3 opacity-40" />
           <p>{t('कोई लेख नहीं मिला', 'No articles found')}</p>
         </div>
       )}
 
-      {!loading && filtered.length > 0 && (
+      {!loading && articles.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((article) => (
+          {articles.map((article) => (
             <Link
               key={article.id}
               href={`/articles/${article.slug}`}

@@ -3,6 +3,7 @@ import { Suspense, useEffect, useState, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
+import DailyCalendar from '@/components/DailyCalendar'
 import {
   Microscope, Scale, BarChart3, Globe, Newspaper,
   Clock, ArrowRight, ArrowLeft, CheckCircle, XCircle,
@@ -252,8 +253,9 @@ function SubjectList() {
         {t('हर विषय में 5 प्रश्न, 10 मिनट का समय', 'Each subject has 5 questions, 10 minutes time')}
       </p>
 
-      <div className="flex items-center gap-2 mb-8 px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700 font-medium">
-        📅 {t('डेली क्विज़ कैलेंडर — जल्द आ रहा है', 'Daily Quiz Calendar — coming soon')}
+      <div className="mb-8">
+        <h2 className="text-sm font-semibold text-gray-600 mb-3">📅 {t('डेली क्विज़ कैलेंडर', 'Daily Quiz Calendar')}</h2>
+        <DailyCalendar />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
