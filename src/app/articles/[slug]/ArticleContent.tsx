@@ -5,7 +5,8 @@ import { useLanguage } from '@/lib/LanguageContext'
 import { Calendar, ArrowLeft, Tag } from 'lucide-react'
 
 // Very simple markdown-like renderer: ## headings, **bold**, newlines
-function renderContent(text: string) {
+function renderContent(text: string | null | undefined) {
+  if (!text) return []
   const lines = text.split('\n')
   const elements: React.ReactNode[] = []
   let key = 0
@@ -71,9 +72,9 @@ export default function ArticleContent({ article }: { article: Article }) {
         </span>
         <span className="text-xs text-gray-400 flex items-center gap-1">
           <Calendar size={12} />
-          {new Date(article.created_at).toLocaleDateString(isEn ? 'en-IN' : 'hi-IN', {
+          {article.created_at ? new Date(article.created_at).toLocaleDateString(isEn ? 'en-IN' : 'hi-IN', {
             year: 'numeric', month: 'long', day: 'numeric'
-          })}
+          }) : ''}
         </span>
       </div>
 
