@@ -31,10 +31,10 @@ const questionBank: Record<string, Question[]> = {
     {
       hi: 'भारत का पहला कृत्रिम उपग्रह कौन सा था?',
       en: 'What was India\'s first artificial satellite?',
-      options: [{ hi: 'आर्यभट्ट', en: 'Aryabhatta' }, { hi: 'भास्कर', en: 'Bhaskar' }, { hi: 'रोहिणी', en: 'Rohini' }, { hi: 'INSAT-1A', en: 'INSAT-1A' }],
+      options: [{ hi: 'आर्यभट्ट', en: 'Aryabhata' }, { hi: 'भास्कर', en: 'Bhaskar' }, { hi: 'रोहिणी', en: 'Rohini' }, { hi: 'INSAT-1A', en: 'INSAT-1A' }],
       correct: 0,
       explanationHi: 'आर्यभट्ट 19 अप्रैल 1975 को लॉन्च किया गया भारत का पहला उपग्रह था।',
-      explanationEn: 'Aryabhatta was India\'s first satellite, launched on April 19, 1975.',
+      explanationEn: 'Aryabhata was India\'s first satellite, launched on April 19, 1975.',
     },
     {
       hi: 'DNA का पूरा नाम क्या है?',
@@ -87,7 +87,7 @@ const questionBank: Record<string, Question[]> = {
       explanationEn: 'The President is elected by an Electoral College consisting of elected members of both Houses of Parliament and State Legislatures.',
     },
     {
-      hi: 'संविधान का कौन सा अनुच्छेद मौलिक अधिकारों से संबंधित है?',
+      hi: 'संविधान का कौन सा भाग मौलिक अधिकारों से संबंधित है?',
       en: 'Which part of the Constitution deals with Fundamental Rights?',
       options: [{ hi: 'भाग II (अनु. 5-11)', en: 'Part II (Art. 5-11)' }, { hi: 'भाग III (अनु. 12-35)', en: 'Part III (Art. 12-35)' }, { hi: 'भाग IV (अनु. 36-51)', en: 'Part IV (Art. 36-51)' }, { hi: 'भाग V (अनु. 52-151)', en: 'Part V (Art. 52-151)' }],
       correct: 1,
@@ -145,12 +145,12 @@ const questionBank: Record<string, Question[]> = {
       explanationEn: 'NITI Aayog replaced the Planning Commission on January 1, 2015.',
     },
     {
-      hi: 'भारत की GDP के हिसाब से विश्व में क्या स्थान है? (2024)',
-      en: 'What is India\'s rank by GDP in the world? (2024)',
+      hi: 'भारत की GDP के हिसाब से विश्व में क्या स्थान है? (2025-26)',
+      en: 'What is India\'s rank by GDP in the world? (2025-26)',
       options: [{ hi: '3rd', en: '3rd' }, { hi: '4th', en: '4th' }, { hi: '5th', en: '5th' }, { hi: '6th', en: '6th' }],
-      correct: 2,
-      explanationHi: '2024 में भारत दुनिया की 5वीं सबसे बड़ी अर्थव्यवस्था है और शीघ्र ही तीसरी बनने की उम्मीद है।',
-      explanationEn: 'In 2024, India is the 5th largest economy in the world and is expected to become the 3rd soon.',
+      correct: 1,
+      explanationHi: '2025 में भारत जापान को पछाड़कर विश्व की चौथी सबसे बड़ी अर्थव्यवस्था बन गया।',
+      explanationEn: 'In 2025, India overtook Japan to become the 4th largest economy by nominal GDP.',
     },
   ],
   geography: [
@@ -159,8 +159,8 @@ const questionBank: Record<string, Question[]> = {
       en: 'Which is the longest river in India?',
       options: [{ hi: 'यमुना', en: 'Yamuna' }, { hi: 'गंगा', en: 'Ganga' }, { hi: 'गोदावरी', en: 'Godavari' }, { hi: 'नर्मदा', en: 'Narmada' }],
       correct: 1,
-      explanationHi: 'गंगा नदी 2,525 km लंबी है और भारत की सबसे लंबी नदी है।',
-      explanationEn: 'The Ganga river is 2,525 km long and is the longest river in India.',
+      explanationHi: 'भारत के भीतर प्रवाहित होने वाली सबसे लंबी नदी गंगा है (2,525 km)। सिंधु नदी कुल लंबाई में अधिक है परंतु इसका अधिकांश भाग पाकिस्तान में बहता है।',
+      explanationEn: 'The Ganga (2,525 km) is the longest river flowing within India. The Indus is longer overall but most of its course is in Pakistan.',
     },
     {
       hi: 'सबसे लंबी तटरेखा किस राज्य की है?',
@@ -191,8 +191,8 @@ const questionBank: Record<string, Question[]> = {
       en: 'Which is the highest mountain peak in India?',
       options: [{ hi: 'माउंट एवरेस्ट', en: 'Mount Everest' }, { hi: 'K2', en: 'K2' }, { hi: 'कंचनजंघा', en: 'Kangchenjunga' }, { hi: 'नंदा देवी', en: 'Nanda Devi' }],
       correct: 2,
-      explanationHi: 'कंचनजंघा (8,586 m) पूर्णतः भारत में स्थित सबसे ऊँचा पर्वत शिखर है। K2 भारत के नियंत्रण वाले POK में है।',
-      explanationEn: 'Kangchenjunga (8,586 m) is the highest peak entirely within India. K2 is in POK controlled by India.',
+      explanationHi: 'K2 (8,611 मी.) विश्व का दूसरा सबसे ऊँचा पर्वत है, लेकिन यह पाकिस्तान-अधिकृत गिलगित-बाल्टिस्तान में स्थित है। भारत के प्रशासनिक नियंत्रण में सबसे ऊँचा शिखर कंचनजंगा (8,586 मी.) है।',
+      explanationEn: 'K2 (8,611m) is the world\'s second highest peak but is located in Gilgit-Baltistan under Pakistani administration. Kangchenjunga (8,586m) is the highest peak within Indian-administered territory.',
     },
   ],
   current_affairs: [
