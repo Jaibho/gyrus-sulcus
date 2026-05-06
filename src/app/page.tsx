@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { Dancing_Script } from 'next/font/google'
 import { useLanguage } from '@/lib/LanguageContext'
 import VisitorCounter from '@/components/VisitorCounter'
+import ContinueLearning from '@/components/ContinueLearning'
 import {
   Microscope, Scale, BarChart3, Globe, Newspaper,
   CheckCircle, Languages, Smartphone, FileDown, ArrowRight,
@@ -104,13 +105,13 @@ export default function HomePage() {
     <>
       {/* Hero Section */}
       <section className="overflow-hidden">
-        <div className="relative w-full">
+        <div className="relative w-full h-[260px] sm:h-auto bg-[#0c2d6e]">
           <Image
             src="/banner.jpg"
             alt="Gyrus Sulcus — I know that I don't know"
             width={1200}
             height={400}
-            className="w-full h-auto object-cover"
+            className="w-full h-full sm:h-auto object-cover object-left sm:object-center"
             priority
           />
           {/* Handwritten signature overlay */}
@@ -130,17 +131,33 @@ export default function HomePage() {
             — Dharmendra
           </div>
         </div>
-        <div className="bg-gradient-to-r from-brand-600 to-brand-800 py-5">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link href="/tests" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-brand-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors shadow-lg">
-              {t('आज का टेस्ट दें', 'Take Today\'s Test')} <ArrowRight size={18} />
+        {/* Clear visual separator so CTAs don't blend into the banner's blue */}
+        <div className="h-1.5 bg-amber-400" />
+        <div className="bg-white border-b border-gray-100 py-7 sm:py-8">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-3">
+            {/* Trust line */}
+            <p className="text-xs sm:text-sm text-gray-500 tracking-wide uppercase font-medium">
+              {t('13 लाख+ छात्रों का भरोसा • रोज़ 100+ नए MCQs', 'Trusted by 13 Lakh+ students • 100+ new MCQs daily')}
+            </p>
+
+            {/* ONE primary CTA */}
+            <Link
+              href="/tests"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-600 text-white font-bold text-base sm:text-lg rounded-xl hover:bg-brand-700 transition-colors shadow-lg ring-4 ring-brand-100"
+            >
+              {t('आज का फ्री टेस्ट शुरू करें', "Take Today's Free Test")} <ArrowRight size={20} />
             </Link>
-            <Link href="/articles" className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors">
-              {t('लेख पढ़ें', 'Read Articles')}
+
+            {/* Soft secondary — text link only */}
+            <Link href="/articles" className="text-sm text-brand-600 hover:text-brand-700 hover:underline font-medium">
+              {t('या आज का लेख पढ़ें →', "or read today's article →")}
             </Link>
           </div>
         </div>
       </section>
+
+      {/* Returning-student personalization (hidden for first-time visitors) */}
+      <ContinueLearning />
 
       {/* Description */}
       <section className="max-w-4xl mx-auto text-center px-4 py-10">
@@ -175,7 +192,7 @@ export default function HomePage() {
               <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${sub.color}`}><sub.icon size={22} /></div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900">{t(sub.hi, sub.en)}</h3>
-                <p className="text-sm text-gray-500">{t('5 प्रश्न', '5 Questions')}</p>
+                <p className="text-sm text-gray-500">{t('30+ प्रश्न', '30+ Questions')}</p>
               </div>
               <span className="text-brand-500 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                 {t('शुरू करें', 'Start')} <ArrowRight size={14} />
