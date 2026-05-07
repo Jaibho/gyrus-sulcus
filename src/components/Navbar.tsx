@@ -1,17 +1,35 @@
 'use client'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLanguage } from '@/lib/LanguageContext'
+import SmartSearch from '@/components/SmartSearch'
+import { getStreak } from '@/lib/progress'
 import {
   Home, ClipboardList, BookOpen, GraduationCap, FileText,
-  Search, User, Menu, X, Library, ShoppingCart
+  Search, User, Menu, X, Library, ShoppingCart, Flame, HeartPulse
 } from 'lucide-react'
 
 export default function Navbar() {
   const { lang, toggleLang, t } = useLanguage()
   const [searchOpen, setSearchOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [streak, setStreak] = useState(0)
+
+  useEffect(() => {
+    setStreak(getStreak().count)
+  }, [])
+
+  // Global Cmd/Ctrl+K opens search from anywhere
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setSearchOpen(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const navItems = [
     {
@@ -51,6 +69,12 @@ export default function Navbar() {
       mobileCls: 'text-indigo-700 hover:bg-indigo-50',
     },
     {
+      href: '/wellness', label: t('Wellness', 'Wellness'), icon: HeartPulse,
+      iconCls: 'text-rose-500',
+      baseCls: 'text-rose-700 hover:bg-rose-50 hover:text-rose-700',
+      mobileCls: 'text-rose-700 hover:bg-rose-50',
+    },
+    {
       href: '/store', label: t('स्टोर', 'Store'), icon: ShoppingCart,
       iconCls: 'text-amber-500',
       baseCls: 'text-amber-700 hover:bg-amber-50 hover:text-amber-700 ring-1 ring-amber-300 bg-amber-50',
@@ -88,39 +112,38 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right: Search + Lang + Login */}
+          {/* Right: Search + Streak + Lang + Login */}
           <div className="flex items-center gap-2">
-            {/* Search Bar */}
-            <div className="relative hidden sm:block">
-              {searchOpen ? (
-                <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
-                  <Search size={16} className="text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder={t('लेख खोजें...', 'Search articles...')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && searchQuery.trim()) {
-                        window.location.href = `/articles?search=${encodeURIComponent(searchQuery)}`
-                      }
-                    }}
-                    className="ml-2 bg-transparent outline-none text-sm w-40 placeholder-gray-400"
-                    autoFocus
-                  />
-                  <button onClick={() => { setSearchOpen(false); setSearchQuery('') }}>
-                    <X size={14} className="text-gray-400 hover:text-gray-600" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setSearchOpen(true)}
-                  className="p-2 text-gray-500 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition-colors"
-                >
-                  <Search size={18} />
-                </button>
-              )}
-            </div>
+            {/* Smart search trigger — unified across articles, tests, resources */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="hidden sm:flex items-center gap-2 bg-gray-50 border border-gray-200 hover:border-brand-300 hover:bg-brand-50 rounded-lg px-3 py-1.5 text-sm text-gray-400 transition-colors"
+              aria-label="Search"
+            >
+              <Search size={15} />
+              <span>{t('सब कुछ खोजें...', 'Search everything...')}</span>
+              <kbd className="ml-2 text-[10px] font-mono bg-white border border-gray-200 rounded px-1 py-0.5 text-gray-400">⌘K</kbd>
+            </button>
+
+            {/* Mobile search icon */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="sm:hidden p-2 text-gray-500 hover:text-brand-500 hover:bg-brand-50 rounded-lg"
+              aria-label="Search"
+            >
+              <Search size={18} />
+            </button>
+
+            {/* Streak badge — only shown when user has a streak */}
+            {streak > 0 && (
+              <Link
+                href="/leaderboard"
+                className="hidden sm:inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold hover:opacity-90 transition-opacity"
+                title={t('लीडरबोर्ड पर जाएं', 'Go to leaderboard')}
+              >
+                <Flame size={12} /> {streak}
+              </Link>
+            )}
 
             {/* Language Toggle */}
             <button
@@ -154,15 +177,19 @@ export default function Navbar() {
         {/* Mobile Nav */}
         {mobileOpen && (
           <div className="md:hidden pb-4 border-t border-gray-100 mt-2">
-            {/* Mobile Search */}
-            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 mt-3 mb-2">
-              <Search size={16} className="text-gray-400" />
-              <input
-                type="text"
-                placeholder={t('लेख खोजें...', 'Search articles...')}
-                className="ml-2 bg-transparent outline-none text-sm w-full placeholder-gray-400"
-              />
-            </div>
+            {/* Streak pill in mobile menu */}
+            {streak > 0 && (
+              <Link
+                href="/leaderboard"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-between gap-2 my-3 px-3 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 text-white"
+              >
+                <span className="flex items-center gap-2 text-sm font-bold">
+                  <Flame size={14} /> {t(`${streak}-दिन की स्ट्रीक`, `${streak}-day streak`)}
+                </span>
+                <span className="text-xs font-semibold">{t('लीडरबोर्ड', 'Leaderboard')} →</span>
+              </Link>
+            )}
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -177,6 +204,9 @@ export default function Navbar() {
           </div>
         )}
       </div>
+
+      {/* Smart search modal, portal-style */}
+      <SmartSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </nav>
   )
 }

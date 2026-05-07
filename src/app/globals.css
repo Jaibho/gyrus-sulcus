@@ -4,9 +4,18 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+html {
+  background-color: #f8f9fa;
+}
+
 body {
   font-family: 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
-  background-color: #f8f9fa;
+  background-color: transparent;
   /* Disable text selection sitewide */
   -webkit-user-select: none;
   -moz-user-select: none;

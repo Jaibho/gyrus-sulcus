@@ -12,21 +12,21 @@ export default function RasAnnouncementBar() {
 
   return (
     <div
-      className="relative flex items-center justify-center gap-3 px-4 py-2.5 text-white text-sm font-medium"
+      className="relative flex items-center justify-center gap-2 px-8 sm:px-4 py-2 sm:py-2.5 text-white text-xs sm:text-sm font-medium overflow-hidden"
       style={{ background: 'linear-gradient(90deg, #ea580c, #dc2626, #ea580c)', backgroundSize: '200% 100%' }}
     >
-      {/* Content */}
-      <div className="flex items-center gap-2 flex-wrap justify-center">
-        <span className="flex items-center gap-1.5 font-bold">
-          <Flame size={15} className="shrink-0" />
-          {t('नया सेक्शन:', 'NEW:')}
+      {/* Content — single line, truncated on mobile */}
+      <div className="flex items-center gap-2 min-w-0 max-w-full">
+        <span className="flex items-center gap-1.5 font-bold shrink-0">
+          <Flame size={13} className="shrink-0" />
+          {t('नया:', 'NEW:')}
         </span>
-        <span className="opacity-90">
-          {t('RAS English Medium — विशेष सामग्री आ रही है', 'RAS English Medium — Special content coming soon')}
+        <span className="opacity-90 truncate">
+          {t('RAS English Medium — विशेष सामग्री आ रही है', 'RAS English Medium — Special content coming')}
         </span>
         <Link
           href="/ras-english"
-          className="flex items-center gap-1 bg-white/20 hover:bg-white/30 border border-white/30 px-3 py-0.5 rounded-full text-xs font-bold transition-colors shrink-0"
+          className="hidden sm:flex items-center gap-1 bg-white/20 hover:bg-white/30 border border-white/30 px-3 py-0.5 rounded-full text-xs font-bold transition-colors shrink-0"
         >
           {t('देखें', 'Explore')} <ArrowRight size={12} />
         </Link>
@@ -35,7 +35,7 @@ export default function RasAnnouncementBar() {
       {/* Dismiss */}
       <button
         onClick={() => setDismissed(true)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-white/20 rounded-full transition-colors"
+        className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-white/20 rounded-full transition-colors shrink-0"
         aria-label="Dismiss"
       >
         <X size={14} />

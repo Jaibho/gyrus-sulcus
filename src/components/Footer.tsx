@@ -32,6 +32,8 @@ export default function Footer() {
               <Link href="/resources" className="hover:text-white transition-colors">{t('संसाधन', 'Resources')}</Link>
               <Link href="/store" className="hover:text-amber-400 text-amber-400 transition-colors font-semibold">{t('🛒 स्टोर', '🛒 Store')}</Link>
               <Link href="/about" className="hover:text-white transition-colors">{t('हमारे बारे में', 'About Us')}</Link>
+              <Link href="/authors/dharmendra-sir" className="hover:text-white transition-colors">{t('लेखक', 'Author')}</Link>
+              <Link href="/editorial-policy" className="hover:text-white transition-colors">{t('संपादकीय नीति', 'Editorial Policy')}</Link>
               <Link href="/privacy" className="hover:text-white transition-colors">{t('गोपनीयता नीति', 'Privacy Policy')}</Link>
             </div>
           </div>
