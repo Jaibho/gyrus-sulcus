@@ -50,6 +50,52 @@ const mostViewedVideos = [
   { id: 'XsWc6k5Q0Dk', titleHi: 'गिरोलैंडो (जीव विज्ञान)', titleEn: 'Girolando (Biology)', tagHi: 'जीव विज्ञान', tagEn: 'Biology' },
 ]
 
+type HomeArticle = {
+  slug: string
+  title: string
+  title_en?: string
+  category?: string
+  excerpt?: string
+  excerpt_en?: string
+  created_at: string
+  is_published?: boolean
+}
+
+function ArticleRibbon({ articles, t }: {
+  articles: HomeArticle[]
+  t: (hi: string, en: string) => string
+}) {
+  if (!articles.length) return null
+  return (
+    <div className="flex gap-4 overflow-x-auto pb-3 snap-x -mx-4 px-4">
+      {articles.map((a) => (
+        <Link
+          key={a.slug}
+          href={`/articles/${a.slug}`}
+          className="snap-start shrink-0 w-64 sm:w-72 bg-white rounded-xl border border-gray-100 p-4 hover:shadow-lg hover:border-brand-200 transition-all group flex flex-col"
+        >
+          {a.category && (
+            <span className="self-start bg-brand-50 text-brand-600 text-[11px] px-2 py-0.5 rounded-full font-medium mb-2">
+              {a.category}
+            </span>
+          )}
+          <h4 className="font-bold text-gray-900 leading-snug line-clamp-3 group-hover:text-brand-500 transition-colors">
+            {t(a.title, a.title_en || a.title)}
+          </h4>
+          {(a.excerpt || a.excerpt_en) && (
+            <p className="text-gray-500 text-sm mt-2 line-clamp-2">
+              {t(a.excerpt || '', a.excerpt_en || a.excerpt || '')}
+            </p>
+          )}
+          <span className="mt-auto pt-3 text-brand-500 text-sm font-medium flex items-center gap-1">
+            {t('पढ़ें', 'Read')} <ArrowRight size={14} />
+          </span>
+        </Link>
+      ))}
+    </div>
+  )
+}
+
 function VideoRibbon({ title, videos, t }: {
   title: string
   videos: { id: string; titleHi: string; titleEn: string; tagHi: string; tagEn: string }[]
@@ -131,6 +177,9 @@ export default function HomePage() {
   // Falls back to the static `latestVideos` list if the fetch fails.
   const [liveLatest, setLiveLatest] = useState<typeof latestVideos | null>(null)
 
+  // Article headings for the homepage scrollable ribbon (from /data/articles.json)
+  const [homeArticles, setHomeArticles] = useState<HomeArticle[]>([])
+
   useEffect(() => {
     const id = setInterval(() => setCountdown(getSecondsUntil8AM()), 1000)
     return () => clearInterval(id)
@@ -151,6 +200,25 @@ export default function HomePage() {
             tagEn: 'New',
           }))
         )
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/data/articles.json')
+      .then((r) => r.json())
+      .then((data: HomeArticle[]) => {
+        if (cancelled || !Array.isArray(data)) return
+        // Newest first, cap the ribbon length
+        const sorted = [...data]
+          .filter((a) => a && a.slug && (a.is_published ?? true))
+          .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
+          .slice(0, 12)
+        setHomeArticles(sorted)
       })
       .catch(() => {})
     return () => {
@@ -285,6 +353,19 @@ export default function HomePage() {
           t={t}
         />
       </section>
+
+      {/* Articles Ribbon — scrollable headings */}
+      {homeArticles.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 pb-16">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">{t('📝 नवीनतम लेख', '📝 Latest Articles')}</h2>
+            <Link href="/articles" className="text-brand-500 font-medium text-sm flex items-center gap-1 hover:underline">
+              {t('सभी लेख', 'All Articles')} <ArrowRight size={14} />
+            </Link>
+          </div>
+          <ArticleRibbon articles={homeArticles} t={t} />
+        </section>
+      )}
 
       {/* ===== GYRUS SULCUS STORE ===== */}
       <section style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 40%, #fde68a 70%, #fed7aa 100%)' }} className="py-14">
