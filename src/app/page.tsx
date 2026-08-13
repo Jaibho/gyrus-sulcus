@@ -7,7 +7,7 @@ import { useLanguage } from '@/lib/LanguageContext'
 import {
   Microscope, Scale, BarChart3, Globe, Newspaper,
   CheckCircle, Languages, Smartphone, FileDown, ArrowRight,
-  Play, Flame, Radio, Phone, Users, MessageCircle, BookOpen, FileText, Clock,
+  Play, Phone, Users, MessageCircle, BookOpen, FileText, Clock,
   ShoppingCart, Pen, BookMarked, Archive, Tag, GraduationCap
 } from 'lucide-react'
 
@@ -28,35 +28,72 @@ const subjects = [
   { key: 'current_affairs', icon: Newspaper, hi: 'समसामयिकी', en: 'Current Affairs', color: 'bg-rose-50 text-rose-600 border-rose-200' },
 ]
 
-const youtubeVideos = [
-  {
-    id: 'jAiba2Di260',
-    titleHi: 'Critical Thinking — सबसे लोकप्रिय',
-    titleEn: 'Critical Thinking — Most Popular',
-    views: '1.4M+ views',
-    icon: Flame,
-    badge: 'Most Popular',
-    badgeColor: 'bg-red-500',
-  },
-  {
-    id: 'X8qBR8u5178',
-    titleHi: 'MASTER CLASS — Science & Technology',
-    titleEn: 'MASTER CLASS — Science & Technology',
-    views: '100K+ views',
-    icon: Radio,
-    badge: 'Live Class',
-    badgeColor: 'bg-purple-500',
-  },
-  {
-    id: 'AaVBjzPR9Jk',
-    titleHi: 'Why NATO is Silent on Iran?',
-    titleEn: 'Why NATO is Silent on Iran?',
-    views: '42K+ views',
-    icon: Play,
-    badge: 'Latest',
-    badgeColor: 'bg-brand-500',
-  },
+// NOTE: Every id below is a real, verified video from the GYRUS SULCUS channel
+// (https://www.youtube.com/@gyrussulcus1908). Do not add an id you have not
+// confirmed resolves to a live video — broken thumbnails/links look unprofessional.
+// Static fallback used only if the live /api/latest-videos fetch fails.
+// These are the real newest uploads as of the last update; the live API
+// (channel RSS/scrape) keeps the ribbon current automatically after deploy.
+const latestVideos = [
+  { id: 'O_4NPNA4Cpk', titleHi: 'Mecca Agreement — तुर्की-पाकिस्तान-सऊदी', titleEn: 'Mecca Agreement — Turkey-Pakistan-Saudi', tagHi: 'भू-राजनीति', tagEn: 'Geopolitics' },
+  { id: 'O81L-8IHUiY', titleHi: 'सर्पदंश उत्तरजीविता गाइड', titleEn: 'Snakebite Survival Guide', tagHi: 'स्वास्थ्य', tagEn: 'Health' },
+  { id: 'K-eH1VGD8no', titleHi: 'एंटी-वेनम कैसे बनता है?', titleEn: 'How Anti-Venom Is Made & How It Works?', tagHi: 'विज्ञान', tagEn: 'Science' },
+  { id: 'a5imsjWTiis', titleHi: 'हीलियम — दुनिया का नया सोना', titleEn: 'Helium: The New Gold of the World', tagHi: 'विज्ञान', tagEn: 'Science' },
 ]
+
+const mostViewedVideos = [
+  { id: 'jAiba2Di260', titleHi: 'क्रिटिकल थिंकिंग', titleEn: 'Critical Thinking', tagHi: 'लोकप्रिय', tagEn: 'Popular' },
+  { id: 'F6eOS4XKeL8', titleHi: 'ब्रह्मांड की उत्पत्ति', titleEn: 'Origin of the Universe', tagHi: 'विज्ञान', tagEn: 'Science' },
+  { id: 'ds_hc0lk23M', titleHi: 'मानव स्मृति और मस्तिष्क', titleEn: 'Human Memory & Brain', tagHi: 'मनोविज्ञान', tagEn: 'Psychology' },
+  { id: 'AaVBjzPR9Jk', titleHi: 'NATO ईरान पर चुप क्यों है?', titleEn: 'Why NATO is Silent on Iran?', tagHi: 'भू-राजनीति', tagEn: 'Geopolitics' },
+  { id: '69vbyEZXPao', titleHi: 'जीव विज्ञान — रोचक तथ्य', titleEn: 'Biology — Key Facts', tagHi: 'जीव विज्ञान', tagEn: 'Biology' },
+  { id: 'XsWc6k5Q0Dk', titleHi: 'गिरोलैंडो (जीव विज्ञान)', titleEn: 'Girolando (Biology)', tagHi: 'जीव विज्ञान', tagEn: 'Biology' },
+]
+
+function VideoRibbon({ title, videos, t }: {
+  title: string
+  videos: { id: string; titleHi: string; titleEn: string; tagHi: string; tagEn: string }[]
+  t: (hi: string, en: string) => string
+}) {
+  return (
+    <div className="mb-8">
+      <h3 className="text-lg font-bold text-gray-800 mb-3">{title}</h3>
+      <div className="flex gap-4 overflow-x-auto pb-3 snap-x -mx-4 px-4">
+        {videos.map((video) => (
+          <a
+            key={`${title}-${video.id}`}
+            href={`https://www.youtube.com/watch?v=${video.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="snap-start shrink-0 w-64 sm:w-72 bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all group"
+          >
+            <div className="relative aspect-video bg-gray-900">
+              <img
+                src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
+                alt={video.titleEn}
+                loading="lazy"
+                className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <Play size={20} className="text-white ml-0.5" fill="white" />
+                </div>
+              </div>
+              <span className="absolute top-2 left-2 bg-black/70 text-white text-[11px] px-2 py-0.5 rounded-full font-medium">
+                {t(video.tagHi, video.tagEn)}
+              </span>
+            </div>
+            <div className="p-3">
+              <h4 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-brand-500 transition-colors">
+                {t(video.titleHi, video.titleEn)}
+              </h4>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 const features = [
   { icon: CheckCircle, hi: 'गुणवत्तापूर्ण MCQs', en: 'Quality MCQs', descHi: 'रोज़ 100+ नए, परीक्षा-केंद्रित प्रश्न जो आपको वास्तविक परीक्षा के लिए तैयार करते हैं।', descEn: 'Daily 100+ new, exam-focused questions that prepare you for the real exam.' },
@@ -90,9 +127,35 @@ export default function HomePage() {
   const { t } = useLanguage()
   const [countdown, setCountdown] = useState(getSecondsUntil8AM())
 
+  // Live "Latest Videos" — pulled from the channel via /api/latest-videos.
+  // Falls back to the static `latestVideos` list if the fetch fails.
+  const [liveLatest, setLiveLatest] = useState<typeof latestVideos | null>(null)
+
   useEffect(() => {
     const id = setInterval(() => setCountdown(getSecondsUntil8AM()), 1000)
     return () => clearInterval(id)
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/latest-videos')
+      .then((r) => r.json())
+      .then((d: { videos?: { id: string; title: string }[] }) => {
+        if (cancelled || !d.videos || d.videos.length === 0) return
+        setLiveLatest(
+          d.videos.slice(0, 4).map((v) => ({
+            id: v.id,
+            titleHi: v.title,
+            titleEn: v.title,
+            tagHi: 'नया',
+            tagEn: 'New',
+          }))
+        )
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const ch = Math.floor(countdown / 3600).toString().padStart(2, '0')
@@ -202,35 +265,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* YouTube Videos Section */}
+      {/* YouTube Videos Section — scrollable ribbons */}
       <section className="max-w-7xl mx-auto px-4 pb-16">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">{t('YouTube से चुनिंदा वीडियो', 'Featured Videos from YouTube')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t('YouTube वीडियो लेक्चर', 'YouTube Video Lectures')}</h2>
           <a href="https://www.youtube.com/@gyrussulcus1908" target="_blank" rel="noopener noreferrer" className="text-red-500 font-medium text-sm flex items-center gap-1 hover:underline">
             {t('चैनल देखें', 'Visit Channel')} <ArrowRight size={14} />
           </a>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {youtubeVideos.map((video) => (
-            <a key={video.id} href={`https://www.youtube.com/watch?v=${video.id}`} target="_blank" rel="noopener noreferrer" className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all group">
-              <div className="relative aspect-video bg-gray-900">
-                <img src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`} alt={video.titleEn} className="w-full h-full object-cover group-hover:opacity-90 transition-opacity" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <Play size={24} className="text-white ml-1" fill="white" />
-                  </div>
-                </div>
-                <span className={`absolute top-3 left-3 ${video.badgeColor} text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1`}>
-                  <video.icon size={12} /> {video.badge}
-                </span>
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-gray-900 leading-snug group-hover:text-brand-500 transition-colors">{t(video.titleHi, video.titleEn)}</h3>
-                <p className="text-sm text-gray-500 mt-1">{video.views}</p>
-              </div>
-            </a>
-          ))}
-        </div>
+
+        <VideoRibbon
+          title={t('🆕 नवीनतम वीडियो', '🆕 Latest Videos')}
+          videos={liveLatest ?? latestVideos}
+          t={t}
+        />
+        <VideoRibbon
+          title={t('🔥 सर्वाधिक देखे गए', '🔥 Most Watched')}
+          videos={mostViewedVideos}
+          t={t}
+        />
       </section>
 
       {/* ===== GYRUS SULCUS STORE ===== */}
