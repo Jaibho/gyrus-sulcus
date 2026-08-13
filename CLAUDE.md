@@ -59,6 +59,14 @@ A **flat JSON array**. The quiz page (`src/app/tests/page.tsx`) shows questions 
   `current_affairs`.
 - **Date format:** `YYYY-MM-DD` (e.g. today's date).
 - **`correct_answer`:** one lowercase letter — `"a"`, `"b"`, `"c"`, or `"d"`.
+- **⭐ FORMAT RULE (owner preference): at least 50% of each day's MCQs must be
+  UPSC "statement-based" questions** — the `question_*` lists 4 numbered statements and asks
+  *"Which of the statements given above are correct?"*, with options like
+  "1, 2 and 3 only" / "1, 2 and 4 only" / etc. Put each statement on its own line using `\n`
+  (`Consider the following statements:\n1. …\n2. …\n3. …\n4. …\nWhich … are correct?`).
+  **Every individual statement must be independently fact-checked** (true or false on
+  purpose), and `correct_answer` must match the option listing exactly the true statements.
+  The remaining questions can be direct single-fact MCQs.
 
 One item's shape:
 
