@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Gyrus Sulcus | UPSC/IAS/RAS Preparation',
     description: 'रोज़ 100+ MCQs, लेख, और नोट्स — UPSC, IAS, RAS, LDC की तैयारी के लिए',
-    url: 'https://gyrus-sulcus.vercel.app',
+    url: 'https://gyrussulcus.com',
     siteName: 'Gyrus Sulcus',
     images: [
       {
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     description: 'रोज़ 100+ MCQs, लेख, और नोट्स',
     images: ['/banner.jpg'],
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gyrus-sulcus.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gyrussulcus.com'),
   // AdSense site verification (only emitted when a publisher id is configured)
   ...(ADSENSE_CLIENT ? { other: { 'google-adsense-account': ADSENSE_CLIENT } } : {}),
 }

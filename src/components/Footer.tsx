@@ -32,7 +32,9 @@ export default function Footer() {
               <Link href="/resources" className="hover:text-white transition-colors">{t('संसाधन', 'Resources')}</Link>
               <Link href="/store" className="hover:text-amber-400 text-amber-400 transition-colors font-semibold">{t('🛒 स्टोर', '🛒 Store')}</Link>
               <Link href="/about" className="hover:text-white transition-colors">{t('हमारे बारे में', 'About Us')}</Link>
+              <Link href="/contact" className="hover:text-white transition-colors">{t('संपर्क करें', 'Contact')}</Link>
               <Link href="/privacy" className="hover:text-white transition-colors">{t('गोपनीयता नीति', 'Privacy Policy')}</Link>
+              <Link href="/disclaimer" className="hover:text-white transition-colors">{t('अस्वीकरण', 'Disclaimer')}</Link>
             </div>
           </div>
 
