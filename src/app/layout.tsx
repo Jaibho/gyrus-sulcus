@@ -1,7 +1,13 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import './globals.css'
 import ClientLayout from '@/components/ClientLayout'
 import SocialBar from '@/components/SocialBar'
+
+// Google AdSense publisher id, e.g. "ca-pub-1234567890123456".
+// Set NEXT_PUBLIC_ADSENSE_CLIENT in the environment (Vercel → Settings → Env)
+// to switch on monetization. When unset, no ad code loads (nothing breaks).
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT
 
 export const metadata: Metadata = {
   title: 'Gyrus Sulcus | UPSC/IAS/RAS Preparation - Daily MCQs & Articles',
@@ -31,12 +37,26 @@ export const metadata: Metadata = {
     images: ['/banner.jpg'],
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gyrus-sulcus.vercel.app'),
+  // AdSense site verification (only emitted when a publisher id is configured)
+  ...(ADSENSE_CLIENT ? { other: { 'google-adsense-account': ADSENSE_CLIENT } } : {}),
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="hi">
       <body>
+        {/* Google AdSense loader — enables Auto Ads once approved. Loads only
+            when NEXT_PUBLIC_ADSENSE_CLIENT is set, so the site stays clean until
+            monetization is switched on. */}
+        {ADSENSE_CLIENT && (
+          <Script
+            id="adsbygoogle-init"
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
         <ClientLayout>{children}</ClientLayout>
         {/* Fixed logo — bottom-left */}
         <a
