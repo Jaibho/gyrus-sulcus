@@ -34,12 +34,17 @@ students. So, before adding any MCQ, article, or news item:
   the JSON is enough to publish.
 - **Languages:** Every user-facing string is bilingual via `t('हिंदी', 'English')`.
 
-> ⚠️ **Branch note (important):** production has historically been deployed from a
-> `claude/*` working branch rather than a clean `main`, and `main` has at times *diverged*
-> from what is live. **Before starting, confirm which branch Vercel deploys to production**
-> (Vercel dashboard → Project → Settings → Git → Production Branch) and base your work on
-> **that** branch. When in doubt, branch from the branch currently deployed to
-> `gyrussulcus.com`, make changes, push, and open a PR. Do **not** assume `main` is live.
+> ✅ **Deployment (confirmed 13 Aug 2026):** The Vercel project **`gyrus-sulcus`**
+> (account: jaibho) deploys the **`live`** branch to production. **To publish any change:
+> commit and `git push origin HEAD:live`** — Vercel auto-builds and deploys. The working
+> copy here tracks that content; keep editing it and pushing to `live`.
+>
+> ⚠️ **Custom domain caveat:** `gyrussulcus.com` runs on **Cloudflare** and (as of this
+> writing) still points at an older Cloudflare-hosted copy, **not** the Vercel project. The
+> domain has been added to the Vercel project but needs a **DNS cutover at Cloudflare**
+> (point the apex `@` A-record to Vercel's IP shown in the Vercel domain settings) to go
+> fully live. Until then, the deployed result is visible at **`gyrus-sulcus.vercel.app`**.
+> `main` is a separate, diverged, non-deployed branch — ignore it.
 
 ---
 
@@ -151,8 +156,14 @@ npm install          # first time
 npm run build        # MUST pass with no errors before pushing
 ```
 
-Then commit and push to the **production branch confirmed in §1** (or push a branch and open
-a PR). Vercel builds and deploys automatically. After deploy, spot-check:
+Then publish:
+
+```bash
+git add -A && git commit -m "content: update for <date>" && git push origin HEAD:live
+```
+
+Vercel auto-builds and deploys the `live` branch to production. After deploy, spot-check on
+`gyrus-sulcus.vercel.app` (and `gyrussulcus.com` once the DNS cutover in §1 is done):
 `/tests` (today's quiz shows 25 new Qs), `/articles` (new pieces at top), homepage ribbons.
 
 ---
