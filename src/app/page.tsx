@@ -167,11 +167,19 @@ const merchItems = [
 ]
 
 const stats = [
-  { icon: Users, num: '13L+', hi: 'YouTube Subscribers', en: 'YouTube Subscribers' },
-  { icon: MessageCircle, num: '14K+', hi: 'Telegram Members', en: 'Telegram Members' },
+  { icon: Users, num: '13L+', hi: 'YouTube Subscribers', en: 'YouTube Subscribers', live: 'youtube' as const },
+  { icon: MessageCircle, num: '14K+', hi: 'Telegram Members', en: 'Telegram Members', live: 'telegram' as const },
   { icon: BookOpen, num: '1000+', hi: 'दैनिक MCQs', en: 'Daily MCQs' },
   { icon: FileText, num: '500+', hi: 'लेख', en: 'Articles' },
 ]
+
+// Compact count formatter: 2099581 -> "20.99L", 21040 -> "21K"
+function fmtCount(n: number): string {
+  if (n >= 10000000) return (n / 10000000).toFixed(2).replace(/\.?0+$/, '') + 'Cr'
+  if (n >= 100000) return (n / 100000).toFixed(2).replace(/\.?0+$/, '') + 'L'
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K'
+  return String(n)
+}
 
 export default function HomePage() {
   const { t } = useLanguage()
@@ -183,6 +191,9 @@ export default function HomePage() {
 
   // Article headings for the homepage scrollable ribbon (from /data/articles.json)
   const [homeArticles, setHomeArticles] = useState<HomeArticle[]>([])
+
+  // Live social counts (YouTube subscribers + Telegram members) via /api/stats
+  const [liveCounts, setLiveCounts] = useState<{ youtube: number | null; telegram: number | null }>({ youtube: null, telegram: null })
 
   useEffect(() => {
     const id = setInterval(() => setCountdown(getSecondsUntil8AM()), 1000)
@@ -208,6 +219,24 @@ export default function HomePage() {
       .catch(() => {})
     return () => {
       cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    const load = () =>
+      fetch('/api/stats')
+        .then((r) => r.json())
+        .then((d: { youtube?: number | null; telegram?: number | null }) => {
+          if (cancelled) return
+          setLiveCounts({ youtube: d.youtube ?? null, telegram: d.telegram ?? null })
+        })
+        .catch(() => {})
+    load()
+    const id = setInterval(load, 120000) // refresh every 2 min for a "live" feel
+    return () => {
+      cancelled = true
+      clearInterval(id)
     }
   }, [])
 
@@ -324,15 +353,26 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-white text-center mb-8">{t('13 लाख+ छात्रों का भरोसा', '13 Lakh+ Students Trust Us')}</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, i) => (
-              <div key={i} className="text-center">
-                <div className="w-12 h-12 mx-auto bg-white/15 rounded-xl flex items-center justify-center mb-3">
-                  <stat.icon size={24} className="text-white" />
+            {stats.map((stat, i) => {
+              const liveVal = stat.live ? liveCounts[stat.live] : null
+              const display = liveVal != null ? fmtCount(liveVal) : stat.num
+              return (
+                <div key={i} className="text-center">
+                  <div className="w-12 h-12 mx-auto bg-white/15 rounded-xl flex items-center justify-center mb-3">
+                    <stat.icon size={24} className="text-white" />
+                  </div>
+                  <div className="text-3xl font-extrabold text-white mb-1 flex items-center justify-center gap-1.5">
+                    {display}
+                    {liveVal != null && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300 uppercase tracking-wide">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-blue-200 text-sm">{t(stat.hi, stat.en)}</div>
                 </div>
-                <div className="text-3xl font-extrabold text-white mb-1">{stat.num}</div>
-                <div className="text-blue-200 text-sm">{t(stat.hi, stat.en)}</div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
