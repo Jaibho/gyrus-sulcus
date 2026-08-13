@@ -580,7 +580,7 @@ function QuizView() {
               <div key={i} className={`rounded-xl border p-4 ${isCorrect ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'}`}>
                 <div className="flex items-start gap-2 mb-3">
                   {isCorrect ? <CheckCircle size={18} className="text-emerald-500 mt-0.5 shrink-0" /> : <XCircle size={18} className="text-rose-500 mt-0.5 shrink-0" />}
-                  <p className="font-medium text-gray-900 text-sm">{i + 1}. {t(qs.hi, qs.en)}</p>
+                  <p className="font-medium text-gray-900 text-sm whitespace-pre-line">{i + 1}. {t(qs.hi, qs.en)}</p>
                 </div>
                 <div className="ml-6 flex flex-col gap-1.5 mb-3">
                   {qs.options.map((opt, oi) => (
@@ -645,7 +645,7 @@ function QuizView() {
           <span className="w-7 h-7 bg-brand-500 text-white rounded-lg flex items-center justify-center text-sm font-bold shrink-0">{current + 1}</span>
           <span className="text-xs text-gray-400">{t('प्रश्न', 'Question')} {current + 1}/{questions.length}</span>
         </div>
-        <p className="text-gray-900 font-semibold text-lg leading-relaxed mb-6">{t(q.hi, q.en)}</p>
+        <p className="text-gray-900 font-semibold text-lg leading-relaxed mb-6 whitespace-pre-line">{t(q.hi, q.en)}</p>
 
         <div className="flex flex-col gap-3">
           {q.options.map((opt, oi) => {

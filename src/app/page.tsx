@@ -148,6 +148,10 @@ const features = [
   { icon: FileDown, hi: 'PDF नोट्स डाउनलोड', en: 'PDF Notes Download', descHi: 'हस्तलिखित नोट्स और संकलन PDF में डाउनलोड करें — ऑफ़लाइन पढ़ाई के लिए।', descEn: 'Download handwritten notes and compilations in PDF — for offline study.' },
 ]
 
+// Store/merchandise is not launched yet. Flip to true (and re-add the /store
+// links in Navbar.tsx + Footer.tsx) when stock is ready to go live.
+const STORE_LAUNCHED = false
+
 const studyItems = [
   { icon: Pen,         emoji: '✍️', hi: 'हस्तलिखित नोट्स',           en: 'Handwritten Notes',          price: '₹199', descHi: 'टॉपर्स की शैली में',        descEn: 'Topper-style notes' },
   { icon: BookOpen,    emoji: '📗', hi: 'किताबें',                     en: 'Books',                      price: '₹349', descHi: 'Dharmendra Sir द्वारा',     descEn: 'By Dharmendra Sir' },
@@ -367,7 +371,8 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ===== GYRUS SULCUS STORE ===== */}
+      {/* ===== GYRUS SULCUS STORE (hidden until launched) ===== */}
+      {STORE_LAUNCHED && (
       <section style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 40%, #fde68a 70%, #fed7aa 100%)' }} className="py-14">
         <div className="max-w-7xl mx-auto px-4">
           {/* Heading */}
@@ -449,6 +454,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* WhatsApp Contact Bar */}
       <section className="max-w-7xl mx-auto px-4 pb-12">

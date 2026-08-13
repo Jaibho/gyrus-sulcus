@@ -50,13 +50,7 @@ export default function Navbar() {
       baseCls: 'text-indigo-700 hover:bg-indigo-50 hover:text-indigo-700',
       mobileCls: 'text-indigo-700 hover:bg-indigo-50',
     },
-    {
-      href: '/store', label: t('स्टोर', 'Store'), icon: ShoppingCart,
-      iconCls: 'text-amber-500',
-      baseCls: 'text-amber-700 hover:bg-amber-50 hover:text-amber-700 ring-1 ring-amber-300 bg-amber-50',
-      mobileCls: 'text-amber-700 hover:bg-amber-50 bg-amber-50',
-      special: true,
-    },
+    // Store hidden until launched — re-add this item when stock is ready.
   ]
 
   return (
