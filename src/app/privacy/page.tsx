@@ -98,8 +98,8 @@ export default function PrivacyPage() {
         </h2>
         <p className="text-gray-600 text-sm leading-relaxed">
           {t(
-            'किसी भी प्रश्न के लिए हमें contact@gyrussulcus.com पर ईमेल करें या WhatsApp पर +91 75976 47088 से संपर्क करें।',
-            'For any questions, email us at contact@gyrussulcus.com or reach us on WhatsApp at +91 75976 47088.'
+            'किसी भी प्रश्न के लिए कृपया हमारे संपर्क पृष्ठ पर उपलब्ध माध्यमों से हमसे संपर्क करें।',
+            'For any questions, please reach us through the channels on our Contact page.'
           )}
         </p>
       </div>

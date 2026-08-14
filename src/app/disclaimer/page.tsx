@@ -67,10 +67,9 @@ export default function DisclaimerPage() {
         ))}
         <p className="text-gray-600 text-sm leading-relaxed mt-8">
           {t(
-            'किसी भी प्रश्न के लिए ', 'For any questions, contact us at '
+            'किसी भी प्रश्न के लिए कृपया हमारे संपर्क पृष्ठ के माध्यम से संपर्क करें।',
+            'For any questions, please reach us through our Contact page.'
           )}
-          <a href="mailto:contact@gyrussulcus.com" className="text-brand-600 hover:underline">contact@gyrussulcus.com</a>
-          {t(' पर संपर्क करें।', '.')}
         </p>
       </div>
     </div>

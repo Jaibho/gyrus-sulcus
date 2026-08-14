@@ -6,10 +6,9 @@ export default function ContactPage() {
   const { t } = useLanguage()
 
   const rows = [
-    { icon: Mail, label: t('ईमेल', 'Email'), value: 'contact@gyrussulcus.com', href: 'mailto:contact@gyrussulcus.com' },
-    { icon: Phone, label: t('व्हाट्सऐप / फ़ोन', 'WhatsApp / Phone'), value: '+91 75976 47088', href: 'https://wa.me/917597647088' },
-    { icon: Send, label: 'Telegram', value: 't.me/gyrussulcus7597647088', href: 'https://t.me/gyrussulcus7597647088' },
-    { icon: Youtube, label: 'YouTube', value: '@gyrussulcus1908', href: 'https://www.youtube.com/@gyrussulcus1908' },
+    { icon: Phone, label: t('व्हाट्सऐप', 'WhatsApp'), value: t('संदेश भेजें', 'Message us'), href: 'https://wa.me/917597647088' },
+    { icon: Send, label: 'Telegram', value: t('चैनल से जुड़ें', 'Join the channel'), href: 'https://t.me/gyrussulcus7597647088' },
+    { icon: Youtube, label: 'YouTube', value: 'GYRUS SULCUS', href: 'https://www.youtube.com/@gyrussulcus1908' },
     { icon: Instagram, label: 'Instagram', value: '@dharmendrasir12', href: 'https://www.instagram.com/dharmendrasir12/' },
   ]
 
@@ -28,11 +27,8 @@ export default function ContactPage() {
 
       <div className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
         <div className="mb-6">
-          <p className="text-sm text-gray-400">{t('द्वारा संचालित', 'Run by')}</p>
-          <p className="text-lg font-bold text-gray-900">Dharmendra Sir — Gyrus Sulcus</p>
-          <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
-            <MapPin size={14} /> {t('राजस्थान, भारत', '')}
-          </p>
+          <p className="text-lg font-bold text-gray-900">Gyrus Sulcus</p>
+          <p className="text-sm text-gray-500 mt-1">{t('हमसे इन माध्यमों से जुड़ें:', 'Connect with us here:')}</p>
         </div>
 
         <div className="flex flex-col divide-y divide-gray-100">
