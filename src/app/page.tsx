@@ -351,7 +351,7 @@ export default function HomePage() {
       {/* Social Proof Stats */}
       <section className="bg-gradient-to-r from-brand-600 to-brand-800 py-12 mb-0">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-white text-center mb-8">{t('13 लाख+ छात्रों का भरोसा', '13 Lakh+ Students Trust Us')}</h2>
+          <h2 className="text-2xl font-bold text-white text-center mb-8">{t('छात्रों का भरोसा', 'Trusted by Students')}</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, i) => {
               const liveVal = stat.live ? liveCounts[stat.live] : null

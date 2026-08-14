@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
 import { Send, Youtube, Instagram, Phone } from 'lucide-react'
+import VisitorCounter from './VisitorCounter'
 
 export default function Footer() {
   const { t } = useLanguage()
@@ -58,8 +59,9 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-6 text-center text-xs text-gray-500">
-          © 2026 Gyrus Sulcus. All rights reserved.
+        <div className="border-t border-gray-800 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+          <span>© 2026 Gyrus Sulcus. All rights reserved.</span>
+          <VisitorCounter />
         </div>
       </div>
     </footer>
