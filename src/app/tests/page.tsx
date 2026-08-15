@@ -271,7 +271,10 @@ const fallbackQuestionBank: Record<string, Question[]> = {
 }
 
 function toDateStr(d: Date) {
-  return d.toISOString().split('T')[0]
+  // Use the LOCAL calendar date (not UTC). toISOString() returns UTC, which for
+  // IST users in the early hours shows yesterday's date — causing the quiz to
+  // load the previous day's MCQs. Local components fix that.
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 const QUIZ_DURATION = 10 * 60
