@@ -480,7 +480,8 @@ function QuizView() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const subjectKey = searchParams.get('subject') || ''
-  const dateParam = searchParams.get('date') || toDateStr(new Date())
+  const explicitDate = searchParams.get('date') // present only when a specific day was chosen (calendar)
+  const dateParam = explicitDate || toDateStr(new Date())
   const subjectMeta = subjects.find(s => s.key === subjectKey)
 
   const [questions, setQuestions] = useState<Question[]>([])
@@ -495,7 +496,16 @@ function QuizView() {
     fetch('/data/mcqs.json')
       .then(r => r.json())
       .then((data: MCQRow[]) => {
-        const rows = data.filter(r => r.date === dateParam && r.subject === subjectKey)
+        const subjRows = data.filter(r => r.subject === subjectKey)
+        let rows = subjRows.filter(r => r.date === dateParam)
+        // If no specific day was requested (e.g. from the homepage) and today's
+        // set isn't published yet, fall back to the LATEST available day — never
+        // the ancient built-in questions.
+        if (rows.length === 0 && !explicitDate && subjRows.length > 0) {
+          const dates = [...new Set(subjRows.map(r => r.date))].sort()
+          const latest = dates[dates.length - 1]
+          rows = subjRows.filter(r => r.date === latest)
+        }
         if (rows.length > 0) {
           const qs = rows.map(mcqRowToQuestion)
           setQuestions(qs)
