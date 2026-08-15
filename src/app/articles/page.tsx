@@ -61,7 +61,9 @@ export default function ArticlesPage() {
       }
     }
 
-    setArticles(merged)
+    // Hide scheduled (future-dated) articles until their created_at arrives.
+    const now = Date.now()
+    setArticles(merged.filter(a => new Date(a.created_at).getTime() <= now))
     setLoading(false)
   }
 

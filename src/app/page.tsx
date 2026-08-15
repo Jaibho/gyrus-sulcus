@@ -249,6 +249,7 @@ export default function HomePage() {
         // Newest first, cap the ribbon length
         const sorted = [...data]
           .filter((a) => a && a.slug && (a.is_published ?? true))
+          .filter((a) => new Date(a.created_at).getTime() <= Date.now()) // hide scheduled (future) articles
           .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
           .slice(0, 12)
         setHomeArticles(sorted)
