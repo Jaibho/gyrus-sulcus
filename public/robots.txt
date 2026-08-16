@@ -39,6 +39,5 @@ Disallow: /admin
 Disallow: /login
 Disallow: /ras-english
 Disallow: /notes
-Disallow: /courses
 
 Sitemap: https://gyrussulcus.com/sitemap.xml

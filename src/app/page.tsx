@@ -303,13 +303,19 @@ export default function HomePage() {
           </div>
         </div>
         <div className="bg-gradient-to-r from-brand-600 to-brand-800 py-5">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row gap-3 justify-center items-center">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row flex-wrap gap-3 justify-center items-center">
             <Link href="/tests" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-brand-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors shadow-lg">
               {t('आज का टेस्ट दें', 'Take Today\'s Test')} <ArrowRight size={18} />
             </Link>
             <Link href="/articles" className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors">
               {t('लेख पढ़ें', 'Read Articles')}
             </Link>
+            <Link href="/courses" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 transition-colors shadow-lg">
+              {t('कोर्स', 'Courses')} <GraduationCap size={18} />
+            </Link>
+            <a href="https://gyrussulcus.akamai.net.in" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-400 text-amber-900 font-semibold rounded-xl hover:bg-amber-300 transition-colors shadow-lg">
+              {t('ऐप डाउनलोड करें', 'Get the App')} <Smartphone size={18} />
+            </a>
           </div>
         </div>
       </section>

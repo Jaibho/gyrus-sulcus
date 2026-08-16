@@ -12,7 +12,7 @@ type Article = { slug?: string; is_published?: boolean; created_at?: string }
 // (a "Coming Soon" placeholder) so search engines / AdSense don't judge the
 // site on an under-construction page.
 const STATIC_PATHS = [
-  '', 'tests', 'articles', 'resources',
+  '', 'tests', 'articles', 'courses', 'resources',
   'about', 'contact', 'privacy', 'disclaimer',
 ]
 
