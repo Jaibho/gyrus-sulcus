@@ -313,9 +313,9 @@ export default function HomePage() {
             <Link href="/courses" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 transition-colors shadow-lg">
               {t('कोर्स', 'Courses')} <GraduationCap size={18} />
             </Link>
-            <a href="https://gyrussulcus.akamai.net.in" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-400 text-amber-900 font-semibold rounded-xl hover:bg-amber-300 transition-colors shadow-lg">
+            <Link href="/courses#get-app" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-400 text-amber-900 font-semibold rounded-xl hover:bg-amber-300 transition-colors shadow-lg">
               {t('ऐप डाउनलोड करें', 'Get the App')} <Smartphone size={18} />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
