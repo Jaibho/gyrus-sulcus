@@ -1,6 +1,8 @@
 'use client'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
+import AdSlot from '@/components/AdSlot'
+import { AD_SLOTS } from '@/lib/ads'
 import { Calendar, ArrowLeft, Tag } from 'lucide-react'
 
 export interface Article {
@@ -92,6 +94,9 @@ export default function ArticleContent({ article }: { article: Article }) {
       <article className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
         {renderMarkdown(body)}
       </article>
+
+      {/* Ad — below the article content */}
+      <AdSlot slot={AD_SLOTS.articleFooter} />
 
       <div className="mt-8">
         <Link href="/articles" className="inline-flex items-center gap-1.5 text-sm text-brand-500 font-medium hover:underline">

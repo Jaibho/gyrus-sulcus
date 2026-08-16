@@ -3,6 +3,8 @@ import { Suspense, useEffect, useState, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
+import AdSlot from '@/components/AdSlot'
+import { AD_SLOTS } from '@/lib/ads'
 import {
   Microscope, Scale, BarChart3, Globe, Newspaper,
   Clock, ArrowRight, ArrowLeft, CheckCircle, XCircle,
@@ -471,6 +473,9 @@ function SubjectList() {
           )
         })}
       </div>
+
+      {/* Ad — tests landing page, below the subject list */}
+      <AdSlot slot={AD_SLOTS.testsLanding} />
     </div>
   )
 }
@@ -584,6 +589,9 @@ function QuizView() {
           </a>
         </div>
 
+        {/* Ad — after the score card, above the review (content-rich page, safe) */}
+        <AdSlot slot={AD_SLOTS.results} />
+
         <h3 className="text-lg font-bold text-gray-900 mb-4">{t('विस्तृत समीक्षा', 'Detailed Review')}</h3>
         <div className="flex flex-col gap-4 mb-8">
           {questions.map((qs, i) => {
@@ -611,6 +619,9 @@ function QuizView() {
             )
           })}
         </div>
+
+        {/* Ad — below the full review, above the action buttons (well separated) */}
+        <AdSlot slot={AD_SLOTS.articleFooter} />
 
         <div className="flex flex-col sm:flex-row gap-3">
           <button
