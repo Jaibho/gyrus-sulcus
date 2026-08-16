@@ -7,6 +7,8 @@ import { CheckCircle, Star, ExternalLink, BookOpen, Brain, PenTool, Layers, Smar
 // always the authoritative source for pricing and enrolment.
 const APP_URL = 'https://gyrussulcus.akamai.net.in'
 const PLAY_URL = 'https://play.google.com/store/apps/details?id=com.mevwzv.obcdyi'
+// The app site offers Android (Play Store) + Windows. No iOS/App Store build exists.
+const WINDOWS_URL = 'https://appx-content-v2.classx.co.in/windows/Gyrus_Sulcus_Setup_0.0.1.exe'
 
 const courses = [
   {
@@ -131,7 +133,10 @@ export default function CoursesPage() {
         </p>
         <div className="mt-5 flex flex-wrap gap-3 justify-center">
           <a href={PLAY_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 font-semibold rounded-xl hover:bg-gray-100 transition-colors">
-            {t('Play Store से पाएं', 'Get it on Play Store')} <ExternalLink size={16} />
+            {t('Android — Play Store', 'Android — Google Play')} <ExternalLink size={16} />
+          </a>
+          <a href={WINDOWS_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 font-semibold rounded-xl hover:bg-gray-100 transition-colors">
+            {t('Windows के लिए', 'Windows Desktop')} <ExternalLink size={16} />
           </a>
           <a href={APP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 border border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors">
             {t('वेब पर खोलें', 'Open on Web')} <ExternalLink size={16} />
