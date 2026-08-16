@@ -112,3 +112,26 @@ END $$;
 -- SELECT * FROM notes;
 -- SELECT * FROM courses;
 -- SELECT column_name FROM information_schema.columns WHERE table_name = 'articles';
+
+
+-- =====================================================
+-- MCQS TABLE (for the /admin panel + daily quiz)
+-- Run this in Supabase → SQL Editor
+-- =====================================================
+CREATE TABLE IF NOT EXISTS mcqs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  date TEXT NOT NULL,
+  subject TEXT NOT NULL,          -- science_tech | polity | economy | geography | current_affairs
+  question_hi TEXT, question_en TEXT,
+  option_a_hi TEXT, option_a_en TEXT,
+  option_b_hi TEXT, option_b_en TEXT,
+  option_c_hi TEXT, option_c_en TEXT,
+  option_d_hi TEXT, option_d_en TEXT,
+  correct_answer TEXT NOT NULL,   -- a | b | c | d
+  explanation_hi TEXT, explanation_en TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE mcqs ENABLE ROW LEVEL SECURITY;
+-- Public read (the quiz page reads with the anon key); writes happen only via
+-- the server /api/admin/publish route using the service-role key (bypasses RLS).
+CREATE POLICY "MCQs are viewable by everyone" ON mcqs FOR SELECT USING (true);

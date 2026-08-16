@@ -3,6 +3,7 @@ import { Suspense, useEffect, useState, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
+import { supabase } from '@/lib/supabase'
 import AdSlot from '@/components/AdSlot'
 import { AD_SLOTS } from '@/lib/ads'
 import {
@@ -279,6 +280,19 @@ function toDateStr(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+// File-based MCQs (public/data/mcqs.json) merged with any admin-added MCQs in
+// Supabase. Supabase errors (e.g. table absent) are ignored, so the JSON always works.
+async function loadMcqRows(): Promise<MCQRow[]> {
+  let json: MCQRow[] = []
+  try { const r = await fetch('/data/mcqs.json'); if (r.ok) json = await r.json() } catch { /* ignore */ }
+  let db: MCQRow[] = []
+  try {
+    const { data, error } = await supabase.from('mcqs').select('*')
+    if (!error && Array.isArray(data)) db = data as MCQRow[]
+  } catch { /* ignore */ }
+  return [...json, ...db]
+}
+
 const QUIZ_DURATION = 10 * 60
 
 // Mini Calendar Component
@@ -368,8 +382,7 @@ function SubjectList() {
   const [showCalendar, setShowCalendar] = useState(false)
 
   useEffect(() => {
-    fetch('/data/mcqs.json')
-      .then(r => r.json())
+    loadMcqRows()
       .then((data: MCQRow[]) => {
         setAllMcqs(data)
         setAvailableDates(new Set(data.map(r => r.date)))
@@ -498,8 +511,7 @@ function QuizView() {
   const [timeLeft, setTimeLeft] = useState(QUIZ_DURATION)
 
   useEffect(() => {
-    fetch('/data/mcqs.json')
-      .then(r => r.json())
+    loadMcqRows()
       .then((data: MCQRow[]) => {
         const subjRows = data.filter(r => r.subject === subjectKey)
         let rows = subjRows.filter(r => r.date === dateParam)
