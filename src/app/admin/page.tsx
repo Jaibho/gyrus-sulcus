@@ -27,8 +27,43 @@ const emptyArticle = () => ({
   created_at: new Date().toISOString(), is_published: true,
 })
 
-const SAMPLE_MCQS = [emptyMcq()]
-const SAMPLE_ARTICLES = [emptyArticle()]
+// Filled-in examples so the format is copy-paste obvious.
+const SAMPLE_MCQS = [
+  {
+    date: '2026-08-16', subject: 'polity',
+    question_hi: 'निम्नलिखित कथनों पर विचार कीजिए:\n1. राष्ट्रपति संघीय कार्यपालिका का भाग है।\n2. उपराष्ट्रपति राज्यसभा का पदेन सभापति होता है।\n3. राज्यसभा को भंग किया जा सकता है।\nउपर्युक्त में से कौन-से कथन सही हैं?',
+    question_en: 'Consider the following statements:\n1. The President is part of the Union Executive.\n2. The Vice-President is the ex-officio Chairman of the Rajya Sabha.\n3. The Rajya Sabha can be dissolved.\nWhich of the statements given above are correct?',
+    option_a_hi: '1 और 2 केवल', option_a_en: '1 and 2 only',
+    option_b_hi: '2 और 3 केवल', option_b_en: '2 and 3 only',
+    option_c_hi: '1 और 3 केवल', option_c_en: '1 and 3 only',
+    option_d_hi: '1, 2 और 3', option_d_en: '1, 2 and 3',
+    correct_answer: 'a',
+    explanation_hi: 'राज्यसभा एक स्थायी सदन है और इसे भंग नहीं किया जा सकता — अतः कथन 3 गलत है।',
+    explanation_en: 'The Rajya Sabha is a permanent House and cannot be dissolved — so statement 3 is wrong.',
+  },
+  {
+    date: '2026-08-16', subject: 'geography',
+    question_hi: 'भारत की सबसे लंबी नदी कौन-सी है?',
+    question_en: 'Which is the longest river in India?',
+    option_a_hi: 'गोदावरी', option_a_en: 'Godavari',
+    option_b_hi: 'गंगा', option_b_en: 'Ganga',
+    option_c_hi: 'यमुना', option_c_en: 'Yamuna',
+    option_d_hi: 'नर्मदा', option_d_en: 'Narmada',
+    correct_answer: 'b',
+    explanation_hi: 'गंगा (लगभग 2,525 किमी) भारत की सबसे लंबी नदी है।',
+    explanation_en: 'The Ganga (about 2,525 km) is the longest river in India.',
+  },
+]
+const SAMPLE_ARTICLES = [
+  {
+    title: 'नमूना लेख शीर्षक', title_en: 'Sample Article Title',
+    slug: 'sample-article-slug', category: 'समसामयिकी',
+    excerpt: 'यह एक नमूना सारांश है (1–2 पंक्ति)।', excerpt_en: 'This is a sample excerpt (1–2 lines).',
+    content: '## नमूना लेख शीर्षक\n\n### चर्चा में क्यों?\nयहाँ लिखें कि यह क्यों चर्चा में है।\n\n### मुख्य तथ्य\n- पहला तथ्य\n- दूसरा तथ्य',
+    content_en: '## Sample Article Title\n\n### Why in News?\nWrite here why this is in the news.\n\n### Key Facts\n- First fact\n- Second fact',
+    created_at: '2026-08-16T09:00:00.000Z', is_published: true,
+  },
+]
 
 export default function AdminPage() {
   const [password, setPassword] = useState('')
