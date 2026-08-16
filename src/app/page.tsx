@@ -277,21 +277,29 @@ export default function HomePage() {
             className="w-full h-auto object-cover"
             priority
           />
-          {/* Handwritten signature overlay */}
-          <div
-            className={`${dancingScript.className} absolute`}
-            style={{
-              bottom: '9%',
-              right: '5%',
-              fontSize: 'clamp(22px, 3vw, 36px)',
-              color: 'rgba(255, 235, 180, 0.92)',
-              textShadow: '0 1px 6px rgba(0,0,0,0.45)',
-              lineHeight: 1,
-              pointerEvents: 'none',
-              userSelect: 'none',
-            }}
-          >
-            — Dharmendra
+          {/* About button + handwritten signature overlay (bottom-right, near the photo) */}
+          <div className="absolute flex flex-col items-end gap-2" style={{ bottom: '8%', right: '5%' }}>
+            <Link
+              href="/about"
+              className="group inline-flex items-center gap-1.5 rounded-full border border-amber-200/50 bg-black/35 backdrop-blur-sm px-3.5 py-1.5 text-xs sm:text-sm font-medium text-amber-50 shadow-lg transition-all hover:bg-black/55 hover:border-amber-200/90"
+              style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}
+            >
+              {t('धर्मेंद्र सर के बारे में', 'About Dharmendra Sir')}
+              <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <div
+              className={`${dancingScript.className}`}
+              style={{
+                fontSize: 'clamp(22px, 3vw, 36px)',
+                color: 'rgba(255, 235, 180, 0.92)',
+                textShadow: '0 1px 6px rgba(0,0,0,0.45)',
+                lineHeight: 1,
+                pointerEvents: 'none',
+                userSelect: 'none',
+              }}
+            >
+              — Dharmendra
+            </div>
           </div>
         </div>
         <div className="bg-gradient-to-r from-brand-600 to-brand-800 py-5">
