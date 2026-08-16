@@ -8,9 +8,12 @@ type Article = { slug?: string; is_published?: boolean; created_at?: string }
 
 // Static, indexable pages. (We deliberately omit /admin, /login and /store —
 // admin is private, login is not useful to searchers, store is not launched yet.)
+// Content-rich, indexable pages only. We deliberately exclude 'ras-english'
+// (a "Coming Soon" placeholder) so search engines / AdSense don't judge the
+// site on an under-construction page.
 const STATIC_PATHS = [
-  '', 'tests', 'articles', 'notes', 'resources', 'courses',
-  'ras-english', 'about', 'contact', 'privacy', 'disclaimer',
+  '', 'tests', 'articles', 'resources',
+  'about', 'contact', 'privacy', 'disclaimer',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

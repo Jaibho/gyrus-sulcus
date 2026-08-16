@@ -28,8 +28,6 @@ export default function Footer() {
               <Link href="/articles" className="hover:text-white transition-colors">{t('लेख', 'Articles')}</Link>
             </div>
             <div className="flex flex-col gap-2">
-              <Link href="/courses" className="hover:text-white transition-colors">{t('कोर्स', 'Courses')}</Link>
-              <Link href="/notes" className="hover:text-white transition-colors">{t('नोट्स', 'Notes')}</Link>
               <Link href="/resources" className="hover:text-white transition-colors">{t('संसाधन', 'Resources')}</Link>
               <Link href="/about" className="hover:text-white transition-colors">{t('हमारे बारे में', 'About Us')}</Link>
               <Link href="/contact" className="hover:text-white transition-colors">{t('संपर्क करें', 'Contact')}</Link>

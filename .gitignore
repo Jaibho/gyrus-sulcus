@@ -1,3 +1,17 @@
 node_modules/
 .next/
 .env.local
+
+# OS / editor / tooling
+.DS_Store
+.claude/
+next-env.d.ts
+
+# Unrelated sibling projects kept inside this folder (never deploy these)
+/kids-brain-game/
+/remotion-india/
+/remotion-subs/
+/shiva-bike-race/
+/shiva-frog-adventure/
+/shiva-space-adventure/
+/whiteboard/

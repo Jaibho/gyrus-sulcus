@@ -2,7 +2,7 @@
 import { LanguageProvider } from '@/lib/LanguageContext'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import RasAnnouncementBar from '@/components/RasAnnouncementBar'
+// import RasAnnouncementBar from '@/components/RasAnnouncementBar' // hidden until RAS English content is ready
 import CopyProtection from '@/components/CopyProtection'
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -10,7 +10,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     <LanguageProvider>
       <CopyProtection />
       <Navbar />
-      <RasAnnouncementBar />
+      {/* <RasAnnouncementBar />  hidden until RAS English content is ready */}
       <main className="min-h-screen">{children}</main>
       <Footer />
     </LanguageProvider>

@@ -34,5 +34,11 @@ Disallow: /
 # Allow all standard search engine crawlers
 User-agent: *
 Allow: /
+# Keep utility / not-yet-ready pages out of the index (AdSense-friendly)
+Disallow: /admin
+Disallow: /login
+Disallow: /ras-english
+Disallow: /notes
+Disallow: /courses
 
 Sitemap: https://gyrussulcus.com/sitemap.xml

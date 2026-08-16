@@ -33,18 +33,6 @@ export default function Navbar() {
       mobileCls: 'text-purple-700 hover:bg-purple-50',
     },
     {
-      href: '/courses', label: t('कोर्स', 'Courses'), icon: GraduationCap,
-      iconCls: 'text-teal-500',
-      baseCls: 'text-teal-700 hover:bg-teal-50 hover:text-teal-700',
-      mobileCls: 'text-teal-700 hover:bg-teal-50',
-    },
-    {
-      href: '/notes', label: t('नोट्स', 'Notes'), icon: FileText,
-      iconCls: 'text-amber-500',
-      baseCls: 'text-amber-700 hover:bg-amber-50 hover:text-amber-700',
-      mobileCls: 'text-amber-700 hover:bg-amber-50',
-    },
-    {
       href: '/resources', label: t('संसाधन', 'Resources'), icon: Library,
       iconCls: 'text-indigo-500',
       baseCls: 'text-indigo-700 hover:bg-indigo-50 hover:text-indigo-700',
