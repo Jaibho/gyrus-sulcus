@@ -39,12 +39,10 @@ students. So, before adding any MCQ, article, or news item:
 > commit and `git push origin HEAD:live`** — Vercel auto-builds and deploys. The working
 > copy here tracks that content; keep editing it and pushing to `live`.
 >
-> ⚠️ **Custom domain caveat:** `gyrussulcus.com` runs on **Cloudflare** and (as of this
-> writing) still points at an older Cloudflare-hosted copy, **not** the Vercel project. The
-> domain has been added to the Vercel project but needs a **DNS cutover at Cloudflare**
-> (point the apex `@` A-record to Vercel's IP shown in the Vercel domain settings) to go
-> fully live. Until then, the deployed result is visible at **`gyrus-sulcus.vercel.app`**.
-> `main` is a separate, diverged, non-deployed branch — ignore it.
+> ✅ **Domain (cutover DONE, 15 Aug 2026):** `gyrussulcus.com` now serves the Vercel `live`
+> build through Cloudflare — apex A-record → `76.76.21.21` (proxied), Cloudflare SSL mode
+> **Full (Strict)**, `www` → apex 301. See §7 for the full current state (admin panel, ads,
+> counters, env vars). `main` is a separate, diverged, non-deployed branch — ignore it.
 
 ---
 
@@ -202,3 +200,43 @@ When the env var is **unset**, no ad code loads (the site stays clean).
 - ❌ Don't commit secrets. Public config uses `NEXT_PUBLIC_*` env vars only.
 - ✅ Always `npm run build` before pushing.
 - ✅ Keep `mcqs.json` and `articles.json` valid JSON (validate after editing).
+
+---
+
+## 7. Features & setup added Aug 2026 (read this for the full current state)
+
+**Live deploy:** push to branch **`live`** → Vercel project `gyrus-sulcus` auto-builds → served at `gyrussulcus.com` (Cloudflare in front, **SSL mode = Full (Strict)**, apex proxied to Vercel `76.76.21.21`; `www` 301-redirects to apex).
+
+### Content locations (recap)
+- **MCQs:** `public/data/mcqs.json` (flat array, `date`+`subject`) **merged at runtime with the Supabase `mcqs` table** (admin-added). Quiz shows today's local-date set; if today's is empty it shows the latest available day.
+- **Articles:** `public/data/articles.json` **merged with the Supabase `articles` table**. Newest-first. **Future-dated articles are hidden until their `created_at`** (date-based scheduling).
+
+### Scheduling (no cron)
+Date-based: MCQs dated a future day appear when the quiz asks for that day; articles with a future `created_at` are filtered out of the list/homepage until then. So you can post today + "schedule" tomorrow just by setting the dates.
+
+### /admin self-upload panel (`src/app/admin/page.tsx` + `src/app/api/admin/publish/route.ts`)
+- Password-gated (env `ADMIN_PASSWORD`). Writes go through the server route using `SUPABASE_SERVICE_ROLE_KEY` (bypasses RLS; browser never holds write creds).
+- Modes: add MCQ one-by-one, add Article one-by-one, or **bulk upload** (download filled sample JSON → edit → publish).
+- **Setup once:** (1) create the `mcqs` table (SQL at bottom of `supabase-setup.sql`); (2) set env vars `SUPABASE_SERVICE_ROLE_KEY` and `ADMIN_PASSWORD` in Vercel; (3) redeploy.
+
+### Live counters
+- Homepage stat badges show **live YouTube subscribers + Telegram members** via `src/app/api/stats/route.ts` (keyless: mixerno.space + t.me public page), refreshed ~2 min.
+- **Visitor counter** in the footer via `src/app/api/visits/route.ts` (keyless abacus.jasoncameron.dev), once-per-session.
+- **Auto-updating "Latest Videos"** ribbon via `src/app/api/latest-videos/route.ts` (channel RSS/scrape + oEmbed).
+
+### Monetization — Google AdSense
+- Publisher id lives in env `NEXT_PUBLIC_ADSENSE_CLIENT` (currently `ca-pub-5138579700576493`). The loader + `google-adsense-account` meta emit only when it's set (`src/app/layout.tsx`). `public/ads.txt` is published.
+- Ad units: `src/components/AdSlot.tsx` + slot ids in `src/lib/ads.ts` (env `NEXT_PUBLIC_AD_SLOT_*`). Placed on the **quiz results page** and **article footer** (content-rich, policy-safe). They render nothing until a slot id is set — do that only AFTER AdSense approves.
+- ⚠️ Never stack ads on the live quiz-taking screen or near answer buttons (accidental clicks = account ban). Results/article pages only.
+
+### All environment variables (set in Vercel)
+| Var | Purpose | Secret? |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase read | public |
+| `SUPABASE_SERVICE_ROLE_KEY` | admin writes (server only) | **secret** |
+| `ADMIN_PASSWORD` | `/admin` login | **secret** |
+| `NEXT_PUBLIC_ADSENSE_CLIENT` | AdSense publisher id | public |
+| `NEXT_PUBLIC_AD_SLOT_TESTS` / `_RESULTS` / `_ARTICLE` | AdSense ad-unit slot ids (after approval) | public |
+
+### Privacy rule (learned the hard way)
+Never put the owner's personal data (email, address, education, phone beyond the public brand number) on the site or in git without explicit permission. The About page (`src/app/about/page.tsx`) is the owner's own words — do not rewrite it.
