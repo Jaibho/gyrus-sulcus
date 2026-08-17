@@ -20,19 +20,29 @@ async function getArticle(slug: string): Promise<Article | null> {
   const fromJson = arts.find((a) => a.slug === slug && a.is_published !== false)
   if (fromJson) return fromJson
 
-  // 2) Supabase fallback (for any DB-only article), if configured
+  // 2) Supabase fallback (for any DB-only article), if configured.
+  // Guarded with an abort/timeout so a slow or unhealthy database can never
+  // hang the request into a function timeout (which surfaces as a 500).
+  // A missing article must fall through to a clean 404, not a server error.
   try {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     if (url && key && !key.includes('your_') && !url.includes('placeholder')) {
       const { createClient } = await import('@supabase/supabase-js')
       const supabase = createClient(url, key)
-      const { data, error } = await supabase
-        .from('articles').select('*').eq('slug', slug).eq('is_published', true).single()
-      if (!error && data) return data as Article
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), 3000)
+      try {
+        const { data, error } = await supabase
+          .from('articles').select('*').eq('slug', slug).eq('is_published', true)
+          .abortSignal(controller.signal).single()
+        if (!error && data) return data as Article
+      } finally {
+        clearTimeout(timer)
+      }
     }
   } catch {
-    // ignore
+    // DB slow/unhealthy/not-found -> treat as no article (clean 404).
   }
   return null
 }
