@@ -55,6 +55,9 @@ export async function generateStaticParams() {
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const article = await getArticle(slug)
-  if (!article) notFound()
+  // Treat a missing OR content-less article (e.g. a stale/incomplete row left in
+  // the DB after removal) as a clean 404 — never let it fall through and crash
+  // the renderer into a 500.
+  if (!article || (!article.content && !article.content_en)) notFound()
   return <ArticleContent article={article} />
 }

@@ -37,7 +37,7 @@ function renderInline(text: string, keyBase: string) {
 
 // Lightweight Markdown → JSX (headings, lists, blockquotes, paragraphs)
 function renderMarkdown(md: string) {
-  const lines = md.split('\n')
+  const lines = (md || '').split('\n')
   const out: React.ReactNode[] = []
   let list: string[] = []
   let k = 0
@@ -70,7 +70,7 @@ function renderMarkdown(md: string) {
 export default function ArticleContent({ article }: { article: Article }) {
   const { t } = useLanguage()
   const title = t(article.title, article.title_en || article.title)
-  const body = t(article.content, article.content_en || article.content)
+  const body = t(article.content, article.content_en || article.content) || article.content_en || article.content || ''
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
