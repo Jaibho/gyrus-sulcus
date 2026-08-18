@@ -386,13 +386,14 @@ function SubjectList() {
       .then((data: MCQRow[]) => {
         setAllMcqs(data)
         setAvailableDates(new Set(data.map(r => r.date)))
-        // If today has no MCQs but data exists, select the closest available date
+        // Show the MOST RECENT test: today's if it exists, otherwise the latest
+        // available day that is today-or-earlier (never a future scheduled day).
         const today = toDateStr(new Date())
         const hasToday = data.some(r => r.date === today)
         if (!hasToday && data.length > 0) {
           const sorted = [...new Set(data.map(r => r.date))].sort()
-          const future = sorted.find(d => d >= today)
-          setSelectedDate(future || sorted[sorted.length - 1])
+          const earlier = sorted.filter(d => d <= today)
+          setSelectedDate(earlier.length ? earlier[earlier.length - 1] : sorted[sorted.length - 1])
         }
       })
       .catch(() => {/* use fallback */})
@@ -515,12 +516,14 @@ function QuizView() {
       .then((data: MCQRow[]) => {
         const subjRows = data.filter(r => r.subject === subjectKey)
         let rows = subjRows.filter(r => r.date === dateParam)
-        // If no specific day was requested (e.g. from the homepage) and today's
-        // set isn't published yet, fall back to the LATEST available day — never
-        // the ancient built-in questions.
-        if (rows.length === 0 && !explicitDate && subjRows.length > 0) {
+        // If the requested day has no questions for this subject, ALWAYS fall back
+        // to the most recent available day (today-or-earlier) — never the old
+        // built-in demo questions.
+        if (rows.length === 0 && subjRows.length > 0) {
+          const today = toDateStr(new Date())
           const dates = [...new Set(subjRows.map(r => r.date))].sort()
-          const latest = dates[dates.length - 1]
+          const earlier = dates.filter(d => d <= today)
+          const latest = earlier.length ? earlier[earlier.length - 1] : dates[dates.length - 1]
           rows = subjRows.filter(r => r.date === latest)
         }
         if (rows.length > 0) {
@@ -528,16 +531,14 @@ function QuizView() {
           setQuestions(qs)
           setSelected(Array(qs.length).fill(null))
         } else {
-          const fb = fallbackQuestionBank[subjectKey] || []
-          setQuestions(fb)
-          setSelected(Array(fb.length).fill(null))
+          setQuestions([])
+          setSelected([])
         }
         setLoaded(true)
       })
       .catch(() => {
-        const fb = fallbackQuestionBank[subjectKey] || []
-        setQuestions(fb)
-        setSelected(Array(fb.length).fill(null))
+        setQuestions([])
+        setSelected([])
         setLoaded(true)
       })
   }, [subjectKey, dateParam])
