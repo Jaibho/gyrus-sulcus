@@ -51,9 +51,13 @@ export default function ArticlesPage() {
       }
     }
 
-    // Hide scheduled (future-dated) articles until their created_at arrives.
+    // Hide scheduled (future-dated) articles, then always show newest first.
     const now = Date.now()
-    setArticles(merged.filter(a => new Date(a.created_at).getTime() <= now))
+    setArticles(
+      merged
+        .filter(a => new Date(a.created_at).getTime() <= now)
+        .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
+    )
     setLoading(false)
   }
 
