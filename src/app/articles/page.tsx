@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useLanguage } from '@/lib/LanguageContext'
-import { supabase, Article } from '@/lib/supabase'
+import { Article } from '@/lib/supabase'
 import { Calendar, ArrowRight, Loader2, BookOpen } from 'lucide-react'
 
 interface LocalArticle extends Article {
@@ -35,21 +35,11 @@ export default function ArticlesPage() {
       // ignore
     }
 
-    // Try Supabase
-    let supabaseArticles: LocalArticle[] = []
-    try {
-      const { data, error } = await supabase
-        .from('articles')
-        .select('*')
-        .eq('is_published', true)
-        .order('created_at', { ascending: false })
-        .limit(20)
-      if (!error && data) {
-        supabaseArticles = data
-      }
-    } catch {
-      // ignore
-    }
+    // Supabase merge DISABLED: the DB `articles` table schema does not match the
+    // site (it uses content_hi/title_hi, the site expects content/title) and only
+    // holds old, superseded content. Current content lives in articles.json.
+    // Re-enable this once the table schema is aligned with the site.
+    const supabaseArticles: LocalArticle[] = []
 
     // Merge: JSON articles first, then Supabase (de-duplicate by id)
     const seen = new Set<string>()
