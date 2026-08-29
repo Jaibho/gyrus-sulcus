@@ -80,7 +80,7 @@ export default function AboutPage() {
         </p>
         <p>
           {t(
-            'तीसरी — दुनिया को थोड़ा कोमल छोड़ जाना। इस दुनिया से गुज़रने वाला हर इंसान इसे ज़रा नरम, ज़रा कोमल बनाकर जाए — एक मीठे बोल से, एक सिखाए हुए सबक़ से, एक लगाए हुए पेड़ से, एक बेज़ुबान को डाले हुए दाने से, या एक ऐसे विद्यार्थी से — जो आगे चलकर यही भलाई किसी और को लौटा दे।',
+            'तीसरी — दुनिया में थोड़ी और नरमी छोड़ जाना। इस दुनिया से गुज़रने वाला हर इंसान इसमें थोड़ी और नरमी, थोड़ी और मोहब्बत छोड़ जाए — एक मीठे बोल से, एक सिखाए हुए सबक़ से, एक लगाए हुए पेड़ से, एक बेज़ुबान को डाले हुए दाने से, या एक ऐसे विद्यार्थी से — जो आगे चलकर यही भलाई किसी और को लौटा दे।',
             'Three — to leave the world a little gentler. That everyone who passes through this world leaves it a little gentler — with a kind word, a lesson taught, a tree planted, a grain fed to a voiceless creature, a student who goes on to return the same kindness to someone else.'
           )}
         </p>
