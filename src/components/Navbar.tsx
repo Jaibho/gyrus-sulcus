@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useLanguage } from '@/lib/LanguageContext'
 import {
   Home, ClipboardList, BookOpen, GraduationCap, FileText,
-  Search, User, Menu, X, Library, ShoppingCart
+  Search, User, Menu, X, Library, ShoppingCart, Newspaper,
 } from 'lucide-react'
 
 export default function Navbar() {
@@ -31,6 +31,12 @@ export default function Navbar() {
       iconCls: 'text-purple-500',
       baseCls: 'text-purple-700 hover:bg-purple-50 hover:text-purple-700',
       mobileCls: 'text-purple-700 hover:bg-purple-50',
+    },
+    {
+      href: '/current-affairs', label: t('समसामयिकी', 'Current Affairs'), icon: Newspaper,
+      iconCls: 'text-rose-500',
+      baseCls: 'text-rose-700 hover:bg-rose-50 hover:text-rose-700',
+      mobileCls: 'text-rose-700 hover:bg-rose-50',
     },
     {
       href: '/courses', label: t('कोर्स', 'Courses'), icon: GraduationCap,

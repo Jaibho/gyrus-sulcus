@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useLanguage } from '@/lib/LanguageContext'
+import ArticleThumb from '@/components/ArticleThumb'
 import { Article } from '@/lib/supabase'
 import { Calendar, ArrowRight, Loader2, BookOpen } from 'lucide-react'
 
@@ -10,6 +10,7 @@ interface LocalArticle extends Article {
   title_en?: string
   excerpt_en?: string
   content_en?: string
+  image_credit?: string
 }
 
 export default function ArticlesPage() {
@@ -94,24 +95,16 @@ export default function ArticlesPage() {
               href={`/articles/${article.slug}`}
               className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all group"
             >
-              {/* Thumbnail */}
-              <div className="relative h-48 bg-gradient-to-br from-brand-100 to-brand-200 overflow-hidden">
-                {article.image_url ? (
-                  <Image
-                    src={article.image_url}
-                    alt={t(article.title, article.title_en || article.title)}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <BookOpen size={48} className="text-brand-300" />
-                  </div>
-                )}
-                <span className="absolute top-3 left-3 bg-brand-500 text-white text-xs px-2.5 py-1 rounded-full font-medium">
-                  {article.category}
-                </span>
-              </div>
+              {/* Thumbnail — generated from the article's own title, category
+                  and date; uses a licensed photo instead when one is supplied. */}
+              <ArticleThumb
+                title={t(article.title, article.title_en || article.title)}
+                category={article.category}
+                date={article.created_at}
+                slug={article.slug}
+                imageUrl={article.image_url}
+                credit={article.image_credit}
+              />
 
               {/* Content */}
               <div className="p-4">
