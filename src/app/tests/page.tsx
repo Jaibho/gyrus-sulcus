@@ -9,7 +9,8 @@ import { AD_SLOTS } from '@/lib/ads'
 import {
   Microscope, Scale, BarChart3, Globe, Newspaper,
   Clock, ArrowRight, ArrowLeft, CheckCircle, XCircle,
-  Trophy, RotateCcw, Home, CalendarDays, ChevronLeft, ChevronRight
+  Trophy, RotateCcw, Home, CalendarDays, ChevronLeft, ChevronRight,
+  GraduationCap, BookOpenCheck
 } from 'lucide-react'
 
 const subjects = [
@@ -590,6 +591,49 @@ function QuizView() {
           </p>
           <p className="text-sm text-gray-400">{t(subjectMeta.hi, subjectMeta.en)}</p>
         </div>
+
+        {/* Course CTA — placed at the warmest moment on the site: the student
+            has just seen exactly where they stand in this subject. Own-product
+            link, not an ad, and well clear of the answer buttons. */}
+        <Link
+          href="/courses"
+          className="block rounded-2xl border-2 border-brand-200 bg-gradient-to-br from-brand-50 to-white p-5 mb-4 hover:border-brand-400 hover:shadow-md transition-all group"
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-11 h-11 rounded-xl bg-brand-500 text-white flex items-center justify-center shrink-0">
+              <GraduationCap size={22} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-gray-900 leading-snug">
+                {score >= 4
+                  ? t(`${subjectMeta.hi} में आपकी पकड़ अच्छी है — अब इसे पूरा कीजिए`,
+                      `Your grip on ${subjectMeta.en} is good — now take it all the way`)
+                  : t(`${subjectMeta.hi} को और मजबूत बनाइए`,
+                      `Strengthen your ${subjectMeta.en}`)}
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                {t('Gyrus Sulcus कोर्स में इसी विषय की पूरी तैयारी — अवधारणा से लेकर प्रश्न-अभ्यास तक।',
+                   'Complete preparation for this subject in the Gyrus Sulcus course — from concepts to question practice.')}
+              </p>
+              <span className="inline-flex items-center gap-1.5 mt-3 text-brand-600 font-semibold text-sm group-hover:gap-2.5 transition-all">
+                {t('कोर्स देखें', 'View courses')} <ArrowRight size={15} />
+              </span>
+            </div>
+          </div>
+        </Link>
+
+        {/* Free next step — keeps the reader on the site either way. */}
+        <Link
+          href="/current-affairs"
+          className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 mb-6 hover:border-brand-300 transition-colors group"
+        >
+          <BookOpenCheck size={18} className="text-brand-500 shrink-0" />
+          <span className="flex-1 text-sm text-gray-700">
+            {t('आज की समसामयिकी पढ़ें — इन्हीं प्रश्नों के पीछे का पूरा संदर्भ।',
+               "Read today's current affairs — the full context behind these questions.")}
+          </span>
+          <ArrowRight size={15} className="text-gray-400 shrink-0 group-hover:text-brand-500 transition-colors" />
+        </Link>
 
         <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6">
           <span className="text-xl">🕐</span>
