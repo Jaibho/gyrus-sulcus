@@ -15,3 +15,8 @@ next-env.d.ts
 /shiva-frog-adventure/
 /shiva-space-adventure/
 /whiteboard/
+/shiva-airforce/
+/shiva-penguin-race/
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>समीक्षा — Gyrus Sulcus (0 लेख, 0 प्रश्न)</title>
+<style>
+:root{--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--brand:#0033CC;--ok:#15803d}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#f8fafc;color:var(--ink)}
+header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:14px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;z-index:10}
+h1{font-size:17px;margin:0;flex:1}
+button{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:600;cursor:pointer}
+button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.count{font-size:13px;color:var(--mut)}
+main{max-width:860px;margin:0 auto;padding:20px}
+h2.sec{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:28px 0 12px}
+.item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.item.off{opacity:.42}
+.head{display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:10px;flex-wrap:wrap}
+.tick{width:18px;height:18px;accent-color:var(--brand)}
+.badge{background:#eef2ff;color:var(--brand);font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px}
+.date{font-size:12px;color:var(--mut)}
+.slug{font-size:11px;color:#94a3b8;font-family:ui-monospace,monospace;margin-left:auto}
+.thumb{aspect-ratio:16/9;border-radius:10px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;margin-bottom:12px}
+.thumb-cat{font-size:11px;font-weight:600;background:rgba(255,255,255,.18);padding:3px 10px;border-radius:99px;align-self:flex-start}
+.thumb-title{font-size:17px;font-weight:700;line-height:1.35;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+.thumb-foot{display:flex;justify-content:space-between;font-size:10px;opacity:.85;letter-spacing:.08em}
+.item h2{font-size:18px;margin:4px 0}
+.en-title,.en{color:var(--mut)}
+.en-title{font-size:13px;margin:0 0 10px}
+details{border-top:1px solid var(--line);padding-top:8px;margin-top:8px}
+summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--brand)}
+.body{font-size:14px;line-height:1.7}
+.body h3,.body h4{font-size:14px;margin:14px 0 6px}
+.body ul{padding-left:20px}
+.q{font-size:15px;line-height:1.7;white-space:normal;margin-bottom:6px}
+.q.en{font-size:13px}
+.opts{list-style:none;padding:0;margin:10px 0}
+.opts li{border:1px solid var(--line);border-radius:8px;padding:8px 11px;margin-bottom:6px;font-size:14px}
+.opts li.correct{border-color:var(--ok);background:#f0fdf4}
+.opts .en{display:block;font-size:12px}
+.tag{float:right;background:var(--ok);color:#fff;font-size:10px;padding:2px 8px;border-radius:99px}
+#saved{display:none;background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:10px 14px;border-radius:8px;margin:16px 0;font-size:14px}
+</style></head><body>
+<header>
+  <h1>समीक्षा — जो टिक रहेगा वही प्रकाशित होगा</h1>
+  <span class="count"><b id="n">0</b> चुने गए</span>
+  <button class="ghost" onclick="all(true)">सभी चुनें</button>
+  <button class="ghost" onclick="all(false)">सभी हटाएँ</button>
+  <button onclick="save()">स्वीकृति सहेजें</button>
+</header>
+<main>
+  <div id="saved">✓ approved.json सहेज लिया गया। अब <b>Approve-And-Publish.command</b> पर डबल-क्लिक करें।</div>
+  <h2 class="sec">लेख — Articles (0)</h2>
+  <p class="count">कोई लेख लंबित नहीं।</p>
+  <h2 class="sec">प्रश्न — MCQs (0)</h2>
+  <p class="count">कोई प्रश्न लंबित नहीं।</p>
+</main>
+<script>
+const items=[...document.querySelectorAll('.item')];
+function sync(){
+  let n=0;
+  items.forEach(it=>{const c=it.querySelector('.tick').checked;it.classList.toggle('off',!c);if(c)n++});
+  document.getElementById('n').textContent=n;
+}
+items.forEach(it=>it.querySelector('.tick').addEventListener('change',sync));
+function all(v){items.forEach(it=>it.querySelector('.tick').checked=v);sync()}
+function save(){
+  const out={articles:[],mcqs:[]};
+  items.forEach(it=>{
+    if(!it.querySelector('.tick').checked)return;
+    (it.dataset.kind==='article'?out.articles:out.mcqs).push(it.dataset.id);
+  });
+  const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='approved.json';a.click();
+  document.getElementById('saved').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+sync();
+</script></body></html>
