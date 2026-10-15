@@ -10,7 +10,10 @@ import SocialBar from '@/components/SocialBar'
 const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT
 
 export const metadata: Metadata = {
-  title: 'Gyrus Sulcus | UPSC/IAS/RAS Preparation - Daily MCQs & Articles',
+  title: {
+    default: 'Gyrus Sulcus | UPSC/IAS/RAS Preparation - Daily MCQs & Articles',
+    template: '%s | Gyrus Sulcus',
+  },
   description: 'UPSC, IAS, RAS और State PCS की तैयारी के लिए रोज़ 100+ MCQs, लेख, हस्तलिखित नोट्स। हिंदी और English दोनों में। Daily MCQs, articles, handwritten notes for UPSC, IAS, RAS, LDC preparation.',
   keywords: ['UPSC', 'IAS', 'RAS', 'MCQ', 'Gyrus Sulcus', 'LDC', 'competitive exam', 'Hindi preparation'],
   authors: [{ name: 'Dharmendra Sir - Gyrus Sulcus' }],
@@ -36,6 +39,7 @@ export const metadata: Metadata = {
     description: 'रोज़ 100+ MCQs, लेख, और नोट्स',
     images: ['/banner.jpg'],
   },
+  manifest: '/manifest.webmanifest',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gyrussulcus.com'),
   // AdSense site verification (only emitted when a publisher id is configured)
   ...(ADSENSE_CLIENT ? { other: { 'google-adsense-account': ADSENSE_CLIENT } } : {}),

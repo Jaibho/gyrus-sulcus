@@ -307,7 +307,7 @@ function MiniCalendar({
   onSelectDate: (d: string) => void
 }) {
   const [viewMonth, setViewMonth] = useState(() => {
-    const d = new Date(selectedDate + 'T12:00:00')
+    const d = selectedDate ? new Date(selectedDate + 'T12:00:00') : new Date()
     return new Date(d.getFullYear(), d.getMonth(), 1)
   })
 
@@ -378,7 +378,10 @@ function MiniCalendar({
 function SubjectList() {
   const { t } = useLanguage()
   const [allMcqs, setAllMcqs] = useState<MCQRow[]>([])
-  const [selectedDate, setSelectedDate] = useState(toDateStr(new Date()))
+  // Start EMPTY and resolve the date only after the MCQ list loads. Initialising
+  // with today's date caused a visible flicker (today -> latest available day)
+  // and a server/client hydration mismatch when the two clocks disagreed.
+  const [selectedDate, setSelectedDate] = useState<string>('')
   const [availableDates, setAvailableDates] = useState<Set<string>>(new Set())
   const [showCalendar, setShowCalendar] = useState(false)
 
@@ -391,22 +394,26 @@ function SubjectList() {
         // available day that is today-or-earlier (never a future scheduled day).
         const today = toDateStr(new Date())
         const hasToday = data.some(r => r.date === today)
-        if (!hasToday && data.length > 0) {
+        if (hasToday || data.length === 0) {
+          setSelectedDate(today)
+        } else {
           const sorted = [...new Set(data.map(r => r.date))].sort()
           const earlier = sorted.filter(d => d <= today)
           setSelectedDate(earlier.length ? earlier[earlier.length - 1] : sorted[sorted.length - 1])
         }
       })
-      .catch(() => {/* use fallback */})
+      .catch(() => { setSelectedDate(toDateStr(new Date())) })
   }, [])
 
   const todaysMcqs = allMcqs.filter(r => r.date === selectedDate)
   const subjectsForDate = new Set(todaysMcqs.map(r => r.subject))
   const hasJsonQuestions = todaysMcqs.length > 0
 
-  const displayDate = new Date(selectedDate + 'T12:00:00').toLocaleDateString('hi-IN', {
-    day: 'numeric', month: 'long', year: 'numeric'
-  })
+  const displayDate = selectedDate
+    ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('hi-IN', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      })
+    : '…'
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -14,6 +15,19 @@ async function getAll(): Promise<CAArticle[]> {
       .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
   } catch {
     return []
+  }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const article = await getAll().then((all) => all.find((a) => a.slug === slug) || null)
+  if (!article) return { title: 'Article not found' }
+  const title = article.title_en || article.title
+  const description = article.excerpt_en || article.excerpt || undefined
+  return {
+    title,
+    description,
+    openGraph: { title: `${title} | Gyrus Sulcus`, description, type: 'article', url: `/current-affairs/${slug}` },
   }
 }
 
