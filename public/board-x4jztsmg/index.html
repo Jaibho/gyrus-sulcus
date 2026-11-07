@@ -519,10 +519,11 @@
     for(const f of files){
       if(f.type.startsWith('image/')){ await addImageSlide(f); added++; }
       else if(f.type==='application/pdf'||/\.pdf$/i.test(f.name)){ added+=await importPdf(f); }
+      else if(/\.pptx$/i.test(f.name)){ added+=await importPptx(f); }
       else { skipped++; }
     }
     if(added) toast(added+' slide'+(added>1?'s':'')+' added');
-    if(skipped) infoCard('PowerPoint needs one step on the Mac','A .pptx cannot be opened on the board directly. On your Mac, double-click “PPT to Board” in the gyrus-board folder and choose the PowerPoint. It makes a file ending in “- board.pdf” in the lessons folder. Copy that file to the panel and import it here, then tap Present.');
+    if(skipped) infoCard('This file type cannot be opened','The board opens PowerPoint (.pptx), PDF and pictures. For an old .ppt or a Keynote file, save it as .pptx first. For Google Slides, use File → Download → Microsoft PowerPoint.');
     buildStrip(); strip.classList.add('open'); scheduleSave(true);
   };
   let pdfLib=null;
@@ -1187,6 +1188,285 @@
     cv.addEventListener('pointerrawupdate',e=>{ cnt.raw++; },{passive:true});
     cv.addEventListener('pointerup',e=>rec(e,'up'));
     addEventListener('resize',()=>{ if(box.classList.contains('on')) size(); }); })();
+  // ================= OPEN .PPTX DIRECTLY ON THE BOARD =================
+  // Reads the PowerPoint file in the browser (JSZip), draws every slide at every click step (text in English/Hindi,
+  // shapes, lines, pictures, tables, groups, master/layout decorations) and hands the steps to the lesson player:
+  // remote Next = next click, writing stays while a slide's lines appear. Entrance/exit click animations are honoured
+  // (shown as "appear"); motion effects, charts and SmartArt are not drawn.
+  let jszipP=null;
+  function loadJSZip(){ if(window.JSZip) return Promise.resolve(window.JSZip); if(!jszipP) jszipP=new Promise((res,rej)=>{ const sc=document.createElement('script'); sc.src='vendor/jszip.min.js'; sc.onload=()=>res(window.JSZip); sc.onerror=()=>{ jszipP=null; rej(new Error('jszip')); }; document.head.appendChild(sc); }); return jszipP; }
+  const OUTW=1920;
+  const kid=(el,n)=>{ if(!el) return null; for(const c of el.children) if(c.localName===n) return c; return null; };
+  const kidsN=(el,n)=>el?[...el.children].filter(c=>c.localName===n):[];
+  const path=(el,...ns)=>{ for(const n of ns){ el=kid(el,n); if(!el) return null; } return el; };
+  const desc=(el,n)=>el?el.getElementsByTagNameNS('*',n)[0]||null:null;
+  const num=(v,d=0)=>{ const x=parseFloat(v); return isFinite(x)?x:d; };
+  const parseXml=t=>new DOMParser().parseFromString(t,'application/xml');
+  const resolveRel=(base,target)=>{ if(target.startsWith('/')) return target.slice(1); const parts=base.split('/'); parts.pop(); for(const s of target.split('/')){ if(s==='..') parts.pop(); else if(s!=='.') parts.push(s); } return parts.join('/'); };
+  const relsOf=async(zip,part)=>{ const i=part.lastIndexOf('/'); const rp=part.slice(0,i)+'/_rels/'+part.slice(i+1)+'.rels'; const f=zip.file(rp); const m={}; if(!f) return m;
+    const d=parseXml(await f.async('string')); for(const r of d.getElementsByTagNameNS('*','Relationship')) m[r.getAttribute('Id')]={target:r.getAttribute('TargetMode')==='External'?null:resolveRel(part,r.getAttribute('Target')),type:r.getAttribute('Type')||''}; return m; };
+
+  // ---------- colours ----------
+  function rgb2hsl(r,g,b){ r/=255; g/=255; b/=255; const mx=Math.max(r,g,b), mn=Math.min(r,g,b); let h=0,s=0; const l=(mx+mn)/2;
+    if(mx!==mn){ const d=mx-mn; s=l>0.5?d/(2-mx-mn):d/(mx+mn); h=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4; h/=6; } return [h,s,l]; }
+  function hsl2rgb(h,s,l){ if(!s) return [l*255,l*255,l*255]; const q=l<0.5?l*(1+s):l+s-l*s, p=2*l-q;
+    const f=t=>{ if(t<0) t+=1; if(t>1) t-=1; return t<1/6?p+(q-p)*6*t:t<1/2?q:t<2/3?p+(q-p)*(2/3-t)*6:p; }; return [f(h+1/3)*255,f(h)*255,f(h-1/3)*255]; }
+  function readColor(holder,C){ if(!holder) return null; let el=null;
+    for(const n of ['srgbClr','schemeClr','sysClr','prstClr','scrgbClr']){ el=kid(holder,n); if(el) break; } if(!el) return null;
+    let r=0,g=0,b=0,a=1;
+    if(el.localName==='srgbClr'){ const v=el.getAttribute('val')||'000000'; r=parseInt(v.slice(0,2),16); g=parseInt(v.slice(2,4),16); b=parseInt(v.slice(4,6),16); }
+    else if(el.localName==='sysClr'){ const v=el.getAttribute('lastClr')||(el.getAttribute('val')==='window'?'FFFFFF':'000000'); r=parseInt(v.slice(0,2),16); g=parseInt(v.slice(2,4),16); b=parseInt(v.slice(4,6),16); }
+    else if(el.localName==='schemeClr'){ let k=el.getAttribute('val'); if(k==='phClr'&&C.phClr) [r,g,b,a]=C.phClr; else { k=(C.map&&C.map[k])||k; const v=C.scheme[k]||'000000'; r=parseInt(v.slice(0,2),16); g=parseInt(v.slice(2,4),16); b=parseInt(v.slice(4,6),16); } }
+    else if(el.localName==='prstClr'){ const P={black:'000000',white:'FFFFFF',red:'FF0000',green:'008000',blue:'0000FF',yellow:'FFFF00',gray:'808080',grey:'808080'}; const v=P[el.getAttribute('val')]||'000000'; r=parseInt(v.slice(0,2),16); g=parseInt(v.slice(2,4),16); b=parseInt(v.slice(4,6),16); }
+    else { r=num(el.getAttribute('r'))/1000*2.55; g=num(el.getAttribute('g'))/1000*2.55; b=num(el.getAttribute('b'))/1000*2.55; }
+    for(const m of el.children){ const v=num(m.getAttribute('val'),100000)/100000;
+      if(m.localName==='alpha') a=v;
+      else if(m.localName==='lumMod'||m.localName==='lumOff'){ let [h,s,l]=rgb2hsl(r,g,b); l=m.localName==='lumMod'?l*v:l+v; [r,g,b]=hsl2rgb(h,s,Math.max(0,Math.min(1,l))); }
+      else if(m.localName==='tint'){ r=r+(255-r)*(1-v); g=g+(255-g)*(1-v); b=b+(255-b)*(1-v); }
+      else if(m.localName==='shade'){ r*=v; g*=v; b*=v; } }
+    return [Math.round(r),Math.round(g),Math.round(b),a]; }
+  const css=c=>c?`rgba(${c[0]},${c[1]},${c[2]},${c[3]})`:null;
+  function readFill(spPr,C){ if(!spPr) return undefined; // undefined = not specified, null = no fill
+    if(kid(spPr,'noFill')) return null; const s=kid(spPr,'solidFill'); if(s) return {color:readColor(s,C)};
+    const g=kid(spPr,'gradFill'); if(g){ const gs=kidsN(path(g,'gsLst'),'gs'); const cs=gs.map(x=>({pos:num(x.getAttribute('pos'))/100000,c:readColor(x,C)})).filter(x=>x.c);
+      return cs.length?{grad:cs,ang:num(path(g,'lin')?.getAttribute('ang'),5400000)/60000}:undefined; }
+    const bf=kid(spPr,'blipFill'); if(bf) return {blip:bf}; return undefined; }
+
+  // ---------- fonts ----------
+  const DEV=/[ऀ-ॿ]/;
+  function fontStack(face,C){ if(!face) face=C.minor; if(face==='+mj-lt'||face==='+mj-cs') face=C.major; if(face==='+mn-lt'||face==='+mn-cs') face=C.minor;
+    const f=String(face||'').replace(/'/g,'');
+    if(/nirmala|mangal|kokila|aparajita|utsaah|devanagari/i.test(f)) return `'${f}','Noto Sans Devanagari','Kohinoor Devanagari',sans-serif`;
+    return `'${f}','Noto Sans',Roboto,'Segoe UI',Arial,'Noto Sans Devanagari',sans-serif`; }
+
+  // ---------- text styles ----------
+  function mergeP(P,el,C){ if(!el) return; const at=n=>el.getAttribute(n);
+    if(at('algn')) P.algn=at('algn'); if(at('marL')!=null) P.marL=num(at('marL')); if(at('indent')!=null) P.indent=num(at('indent'));
+    const ls=kid(el,'lnSpc'); if(ls){ const p=kid(ls,'spcPct'), t=kid(ls,'spcPts'); if(p) { P.lnPct=num(p.getAttribute('val'))/100000; P.lnPts=null; } if(t){ P.lnPts=num(t.getAttribute('val'))/100; P.lnPct=null; } }
+    for(const k of ['spcBef','spcAft']){ const e=kid(el,k); if(e){ const t=kid(e,'spcPts'), p=kid(e,'spcPct'); P[k]=t?{pts:num(t.getAttribute('val'))/100}:p?{pct:num(p.getAttribute('val'))/100000}:P[k]; } }
+    if(kid(el,'buNone')) P.bu=null; const bc=kid(el,'buChar'); if(bc) P.bu={ch:bc.getAttribute('char')||'•'}; const ba=kid(el,'buAutoNum'); if(ba) P.bu={auto:ba.getAttribute('type')||'arabicPeriod',start:num(ba.getAttribute('startAt'),1)};
+    const bcl=kid(el,'buClr'); if(bcl) P.buClr=readColor(bcl,C); const bsz=kid(el,'buSzPct'); if(bsz) P.buSz=num(bsz.getAttribute('val'))/100000;
+    const bf=kid(el,'buFont'); if(bf) P.buFont=bf.getAttribute('typeface'); mergeR(P.r||(P.r={}),kid(el,'defRPr'),C); }
+  function mergeR(R,el,C){ if(!el) return; const at=n=>el.getAttribute(n);
+    if(at('sz')) R.sz=num(at('sz'))/100; if(at('b')!=null) R.b=at('b')==='1'||at('b')==='true'; if(at('i')!=null) R.i=at('i')==='1'||at('i')==='true';
+    if(at('u')) R.u=at('u')!=='none'; if(at('baseline')) R.base=num(at('baseline'))/100000; if(at('cap')) R.cap=at('cap');
+    const f=kid(el,'solidFill'); if(f) R.color=readColor(f,C); if(kid(el,'noFill')) R.color=[0,0,0,0];
+    const la=kid(el,'latin'); if(la&&la.getAttribute('typeface')) R.latin=la.getAttribute('typeface'); const cs=kid(el,'cs'); if(cs&&cs.getAttribute('typeface')) R.cs=cs.getAttribute('typeface');
+    const ea=kid(el,'ea'); if(ea&&ea.getAttribute('typeface')&&!R.latin) R.latin=ea.getAttribute('typeface'); }
+  const deepCopy=o=>JSON.parse(JSON.stringify(o));
+
+  // ---------- one presentation ----------
+  async function readPptx(file,onProgress){ const JSZip=await loadJSZip(); const zip=await JSZip.loadAsync(file);
+    const pres=parseXml(await zip.file('ppt/presentation.xml').async('string')); const presRels=await relsOf(zip,'ppt/presentation.xml');
+    const sz=desc(pres,'sldSz'); const SW=num(sz&&sz.getAttribute('cx'),12192000), SH=num(sz&&sz.getAttribute('cy'),6858000);
+    const k=OUTW/SW, OUTH=Math.round(SH*k);
+    const cache={}; const getDoc=async p=>{ if(!cache[p]){ const f=zip.file(p); cache[p]=f?parseXml(await f.async('string')):null; } return cache[p]; };
+    const imgCache={}; const getImg=async p=>{ if(!(p in imgCache)){ imgCache[p]=null; const f=zip.file(p); if(f&&/\.(png|jpe?g|gif|bmp|webp|svg)$/i.test(p)){
+        const blob=new Blob([await f.async('uint8array')],{type:/\.svg$/i.test(p)?'image/svg+xml':/\.png$/i.test(p)?'image/png':'image/jpeg'});
+        const im=new Image(); im.src=URL.createObjectURL(blob); try{ await im.decode(); imgCache[p]=im; }catch(e){} } } return imgCache[p]; };
+    const defTS=kid(pres.documentElement,'defaultTextStyle');
+    const slideIds=kidsN(kid(pres.documentElement,'sldIdLst'),'sldId').map(s=>s.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id')||s.getAttribute('r:id'));
+    const out=[]; const groups=[]; let done=0;
+    for(const rid of slideIds){ const rel=presRels[rid]; if(!rel||!rel.target) continue; const sp=rel.target; const sd=await getDoc(sp); if(!sd) continue;
+      if(sd.documentElement.getAttribute('show')==='0') continue;
+      const sRels=await relsOf(zip,sp); const layP=Object.values(sRels).find(r=>/slideLayout$/.test(r.type)); const lp=layP&&layP.target; const ld=lp?await getDoc(lp):null; const lRels=lp?await relsOf(zip,lp):{};
+      const mP=Object.values(lRels).find(r=>/slideMaster$/.test(r.type)); const mp=mP&&mP.target; const md=mp?await getDoc(mp):null; const mRels=mp?await relsOf(zip,mp):{};
+      const thP=Object.values(mRels).find(r=>/theme$/.test(r.type)); const td=thP?await getDoc(thP.target):null;
+      const C={scheme:{},map:{},major:'Calibri',minor:'Calibri'};
+      const cs=desc(td,'clrScheme'); if(cs) for(const c of cs.children){ const e=c.firstElementChild; if(!e) continue; C.scheme[c.localName]=e.localName==='sysClr'?(e.getAttribute('lastClr')||'000000'):(e.getAttribute('val')||'000000'); }
+      const fs=desc(td,'fontScheme'); if(fs){ const mj=path(fs,'majorFont','latin'), mn=path(fs,'minorFont','latin'); if(mj) C.major=mj.getAttribute('typeface'); if(mn) C.minor=mn.getAttribute('typeface'); }
+      const cm=md&&kid(md.documentElement,'clrMap'); const ov=path(sd.documentElement,'clrMapOvr','overrideClrMapping');
+      for(const src of [cm,ov]) if(src) for(const a of src.attributes) C.map[a.name]=a.value;
+      const steps=parseSteps(sd);
+      const ctxs={slide:{doc:sd,rels:sRels,part:sp},layout:{doc:ld,rels:lRels,part:lp},master:{doc:md,rels:mRels,part:mp},defTS,txStyles:md&&kid(md.documentElement,'txStyles'),C,k,getImg};
+      for(let s=0;s<steps.n;s++){ const cv=document.createElement('canvas'); cv.width=OUTW; cv.height=OUTH; const g=cv.getContext('2d');
+        await drawSlide(g,ctxs,steps,s,OUTW,OUTH);
+        const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.9)); cv.width=cv.height=0; if(blob) out.push(blob); }
+      groups.push(steps.n); done++; if(onProgress) onProgress(done,slideIds.length); await new Promise(r=>setTimeout(r,0)); }
+    for(const im of Object.values(imgCache)) if(im) URL.revokeObjectURL(im.src);
+    return {blobs:out,groups}; }
+
+  // ---------- click animations ----------
+  function parseSteps(sd){ const appear={}, hide={}; let step=0;
+    const root=desc(sd,'timing'); let main=null;
+    if(root) for(const c of root.getElementsByTagNameNS('*','cTn')) if(c.getAttribute('nodeType')==='mainSeq'){ main=c; break; }
+    if(main){ for(const grp of kidsN(kid(main,'childTnLst'),'par')){
+        const eff=[...grp.getElementsByTagNameNS('*','cTn')].filter(c=>c.getAttribute('presetClass')); if(!eff.length) continue;
+        if(eff[0].getAttribute('nodeType')==='clickEffect') step++;
+        for(const e of eff){ const cls=e.getAttribute('presetClass'); if(cls!=='entr'&&cls!=='exit') continue;
+          for(const t of e.getElementsByTagNameNS('*','spTgt')){ const id=t.getAttribute('spid'); const pr=desc(t,'pRg');
+            const keys=pr?Array.from({length:num(pr.getAttribute('end'))-num(pr.getAttribute('st'))+1},(_,i)=>id+'#'+(num(pr.getAttribute('st'))+i)):[id];
+            for(const key of keys){ if(cls==='entr'){ if(!(key in appear)) appear[key]=step; } else if(!(key in hide)) hide[key]=step; } } } } }
+    return {n:step+1,appear,hide}; }
+  const visibleAt=(st,key,s)=>{ const a=st.appear[key], h=st.hide[key]; return (a===undefined||a<=s)&&(h===undefined||h>s); };
+
+  // ---------- drawing ----------
+  async function drawBg(g,X,W,H){ for(const lvl of ['slide','layout','master']){ const d=X[lvl].doc; const bg=d&&path(d.documentElement,'cSld','bg'); if(!bg) continue;
+      const pr=kid(bg,'bgPr'); const ref=kid(bg,'bgRef');
+      if(pr){ const f=readFill(pr,X.C); if(f&&f.color){ g.fillStyle=css(f.color); g.fillRect(0,0,W,H); return; }
+        if(f&&f.grad){ const gr=g.createLinearGradient(0,0,0,H); f.grad.forEach(s=>gr.addColorStop(s.pos,css(s.c))); g.fillStyle=gr; g.fillRect(0,0,W,H); return; }
+        if(f&&f.blip){ const im=await blipImg(f.blip,X[lvl],X); if(im){ g.drawImage(im,0,0,W,H); return; } } }
+      if(ref){ const c=readColor(ref,X.C); if(c){ g.fillStyle=css(c); g.fillRect(0,0,W,H); return; } } }
+    g.fillStyle='#ffffff'; g.fillRect(0,0,W,H); }
+  async function blipImg(blipFill,L,X){ const b=kid(blipFill,'blip'); if(!b) return null; const id=b.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','embed')||b.getAttribute('r:embed');
+    const r=L.rels[id]; return r&&r.target?await X.getImg(r.target):null; }
+  async function drawSlide(g,X,st,s,W,H){ g.setTransform(1,0,0,1,0,0); await drawBg(g,X,W,H); g.setTransform(X.k,0,0,X.k,0,0);
+    const showM=!(X.layout.doc&&X.layout.doc.documentElement.getAttribute('showMasterSp')==='0');
+    if(showM&&X.master.doc) await drawTree(g,X,'master',path(X.master.doc.documentElement,'cSld','spTree'),null,s,true);
+    if(X.layout.doc) await drawTree(g,X,'layout',path(X.layout.doc.documentElement,'cSld','spTree'),null,s,true);
+    await drawTree(g,X,'slide',path(X.slide.doc.documentElement,'cSld','spTree'),st,s,false);
+    g.setTransform(1,0,0,1,0,0); }
+  const phOf=sp=>{ const nv=kid(sp,'nvSpPr')||kid(sp,'nvPicPr')||kid(sp,'nvGraphicFramePr'); return nv?path(nv,'nvPr','ph'):null; };
+  const idOf=sp=>{ const nv=sp.firstElementChild; const c=nv&&kid(nv,'cNvPr'); return c?c.getAttribute('id'):null; };
+  function findPh(doc,ph){ if(!doc||!ph) return null; const type=ph.getAttribute('type')||'obj', idx=ph.getAttribute('idx'); let byType=null;
+    for(const sp of doc.getElementsByTagNameNS('*','sp')){ const p=phOf(sp); if(!p) continue; const t=p.getAttribute('type')||'obj';
+      if(idx!=null&&p.getAttribute('idx')===idx) return sp;
+      const norm=x=>x==='ctrTitle'?'title':x==='subTitle'||x==='obj'?'body':x; if(!byType&&norm(t)===norm(type)) byType=sp; }
+    return byType; }
+  async function drawTree(g,X,lvl,tree,st,s,decorOnly){ if(!tree) return;
+    for(const el of tree.children){ const n=el.localName; if(!['sp','pic','grpSp','graphicFrame','cxnSp'].includes(n)) continue;
+      if(decorOnly&&phOf(el)) continue;
+      const id=idOf(el); if(st&&id&&!(st.appear[id]===undefined&&st.hide[id]===undefined)&&!visibleAt(st,id,s)){
+        // a shape whose paragraphs build separately still shows when any of its paragraphs is visible
+        if(!Object.keys(st.appear).some(k=>k.startsWith(id+'#')&&visibleAt(st,k,s))) continue; }
+      try{ if(n==='grpSp') await drawGroup(g,X,lvl,el,st,s); else if(n==='pic') await drawPic(g,X,lvl,el); else if(n==='graphicFrame') drawTable(g,X,lvl,el); else await drawShape(g,X,lvl,el,st,s); }catch(e){ console.warn('pptx shape skipped',e); } } }
+  function xfrmOf(el){ const pr=kid(el,'spPr')||kid(el,'grpSpPr')||kid(el,'xfrm')&&el; let x=pr&&(pr===el?kid(el,'xfrm'):kid(pr,'xfrm')); if(!x&&el.localName==='graphicFrame') x=kid(el,'xfrm');
+    if(!x) return null; const o=kid(x,'off'), e=kid(x,'ext'); return {x:num(o&&o.getAttribute('x')),y:num(o&&o.getAttribute('y')),w:num(e&&e.getAttribute('cx')),h:num(e&&e.getAttribute('cy')),
+      rot:num(x.getAttribute('rot'))/60000,fh:x.getAttribute('flipH')==='1',fv:x.getAttribute('flipV')==='1',ch:kid(x,'chOff')?{x:num(kid(x,'chOff').getAttribute('x')),y:num(kid(x,'chOff').getAttribute('y')),w:num(kid(x,'chExt').getAttribute('cx')),h:num(kid(x,'chExt').getAttribute('cy'))}:null}; }
+  async function drawGroup(g,X,lvl,el,st,s){ const t=xfrmOf(el); g.save();
+    if(t&&t.ch&&t.ch.w&&t.ch.h){ g.translate(t.x,t.y); if(t.rot){ g.translate(t.w/2,t.h/2); g.rotate(t.rot*Math.PI/180); g.translate(-t.w/2,-t.h/2); } g.scale(t.w/t.ch.w,t.h/t.ch.h); g.translate(-t.ch.x,-t.ch.y); }
+    await drawTree(g,X,lvl,el,st,s,false); g.restore(); }
+  function withXfrm(g,t,fn){ g.save(); g.translate(t.x+t.w/2,t.y+t.h/2); if(t.rot) g.rotate(t.rot*Math.PI/180); if(t.fh||t.fv) g.scale(t.fh?-1:1,t.fv?-1:1); g.translate(-t.w/2,-t.h/2); fn(); g.restore(); }
+  function geomPath(g,sp,w,h){ const pr=kid(sp,'spPr'); const pg=pr&&kid(pr,'prstGeom'); const cg=pr&&kid(pr,'custGeom'); g.beginPath();
+    if(cg){ for(const p of kidsN(kid(cg,'pathLst'),'path')){ const pw=num(p.getAttribute('w'),w)||w, ph=num(p.getAttribute('h'),h)||h; const sx=w/pw, sy=h/ph;
+        const pt=e=>{ const q=kid(e,'pt')||e; return [num(q.getAttribute('x'))*sx,num(q.getAttribute('y'))*sy]; };
+        for(const c of p.children){ if(c.localName==='moveTo') g.moveTo(...pt(c)); else if(c.localName==='lnTo') g.lineTo(...pt(c));
+          else if(c.localName==='cubicBezTo'){ const q=kidsN(c,'pt').map(x=>[num(x.getAttribute('x'))*sx,num(x.getAttribute('y'))*sy]); if(q.length===3) g.bezierCurveTo(...q[0],...q[1],...q[2]); }
+          else if(c.localName==='quadBezTo'){ const q=kidsN(c,'pt').map(x=>[num(x.getAttribute('x'))*sx,num(x.getAttribute('y'))*sy]); if(q.length===2) g.quadraticCurveTo(...q[0],...q[1]); }
+          else if(c.localName==='close') g.closePath(); } } return 'shape'; }
+    const prst=pg?pg.getAttribute('prst'):'rect'; const adj=n=>{ const gd=pg&&[...pg.getElementsByTagNameNS('*','gd')].find(x=>x.getAttribute('name')===n); return gd?num((gd.getAttribute('fmla')||'').split(' ')[1]):null; };
+    const m=Math.min(w,h);
+    switch(prst){
+      case 'line': case 'straightConnector1': case 'bentConnector3': case 'curvedConnector3': g.moveTo(0,0); g.lineTo(w,h); return 'line';
+      case 'roundRect': { const r=m*(adj('adj')??16667)/100000; g.roundRect?g.roundRect(0,0,w,h,r):g.rect(0,0,w,h); return 'shape'; }
+      case 'ellipse': case 'circle': g.ellipse(w/2,h/2,w/2,h/2,0,0,Math.PI*2); return 'shape';
+      case 'triangle': g.moveTo(w*(adj('adj')??50000)/100000,0); g.lineTo(w,h); g.lineTo(0,h); g.closePath(); return 'shape';
+      case 'rtTriangle': g.moveTo(0,0); g.lineTo(w,h); g.lineTo(0,h); g.closePath(); return 'shape';
+      case 'diamond': g.moveTo(w/2,0); g.lineTo(w,h/2); g.lineTo(w/2,h); g.lineTo(0,h/2); g.closePath(); return 'shape';
+      case 'parallelogram': { const a=m*(adj('adj')??25000)/100000; g.moveTo(a,0); g.lineTo(w,0); g.lineTo(w-a,h); g.lineTo(0,h); g.closePath(); return 'shape'; }
+      case 'homePlate': { const a=m*(adj('adj')??50000)/100000; g.moveTo(0,0); g.lineTo(w-a,0); g.lineTo(w,h/2); g.lineTo(w-a,h); g.lineTo(0,h); g.closePath(); return 'shape'; }
+      case 'chevron': { const a=m*(adj('adj')??50000)/100000; g.moveTo(0,0); g.lineTo(w-a,0); g.lineTo(w,h/2); g.lineTo(w-a,h); g.lineTo(0,h); g.lineTo(a,h/2); g.closePath(); return 'shape'; }
+      case 'rightArrow': { const hy=h*0.25, hx=Math.min(w,m*0.5); g.moveTo(0,hy); g.lineTo(w-hx,hy); g.lineTo(w-hx,0); g.lineTo(w,h/2); g.lineTo(w-hx,h); g.lineTo(w-hx,h-hy); g.lineTo(0,h-hy); g.closePath(); return 'shape'; }
+      case 'leftArrow': { const hy=h*0.25, hx=Math.min(w,m*0.5); g.moveTo(w,hy); g.lineTo(hx,hy); g.lineTo(hx,0); g.lineTo(0,h/2); g.lineTo(hx,h); g.lineTo(hx,h-hy); g.lineTo(w,h-hy); g.closePath(); return 'shape'; }
+      case 'downArrow': { const hx=w*0.25, hy=Math.min(h,m*0.5); g.moveTo(hx,0); g.lineTo(w-hx,0); g.lineTo(w-hx,h-hy); g.lineTo(w,h-hy); g.lineTo(w/2,h); g.lineTo(0,h-hy); g.lineTo(hx,h-hy); g.closePath(); return 'shape'; }
+      case 'upArrow': { const hx=w*0.25, hy=Math.min(h,m*0.5); g.moveTo(hx,h); g.lineTo(w-hx,h); g.lineTo(w-hx,hy); g.lineTo(w,hy); g.lineTo(w/2,0); g.lineTo(0,hy); g.lineTo(hx,hy); g.closePath(); return 'shape'; }
+      case 'hexagon': { const a=m*0.25; g.moveTo(a,0); g.lineTo(w-a,0); g.lineTo(w,h/2); g.lineTo(w-a,h); g.lineTo(a,h); g.lineTo(0,h/2); g.closePath(); return 'shape'; }
+      case 'pentagon': g.moveTo(w/2,0); g.lineTo(w,h*0.38); g.lineTo(w*0.81,h); g.lineTo(w*0.19,h); g.lineTo(0,h*0.38); g.closePath(); return 'shape';
+      default: g.rect(0,0,w,h); return 'shape'; } }
+  function strokeOf(spPr,styleEl,C){ const ln=spPr&&kid(spPr,'ln'); let col, wd=12700, dash=null;
+    if(ln){ if(kid(ln,'noFill')) return null; const f=kid(ln,'solidFill'); if(f) col=readColor(f,C); if(ln.getAttribute('w')) wd=num(ln.getAttribute('w'));
+      const pd=kid(ln,'prstDash'); if(pd&&pd.getAttribute('val')!=='solid') dash=pd.getAttribute('val'); }
+    if(!col&&styleEl){ const r=kid(styleEl,'lnRef'); if(r&&r.getAttribute('idx')!=='0') col=readColor(r,C); }
+    if(!col) return null; return {col,wd,dash}; }
+  async function drawShape(g,X,lvl,sp,st,s){ const L=X[lvl]; const ph=phOf(sp);
+    const lph=ph&&lvl==='slide'?findPh(X.layout.doc,ph):null, mph=ph?findPh(X.master.doc,ph):null;
+    let t=xfrmOf(sp)||(lph&&xfrmOf(lph))||(mph&&xfrmOf(mph)); if(!t) return;
+    const spPr=kid(sp,'spPr'), styleEl=kid(sp,'style');
+    let fill=readFill(spPr,X.C); if(fill===undefined&&styleEl){ const r=kid(styleEl,'fillRef'); if(r&&r.getAttribute('idx')!=='0'){ const c=readColor(r,X.C); if(c) fill={color:c}; } }
+    const stroke=strokeOf(spPr,styleEl,X.C);
+    let img=null; if(fill&&fill.blip) img=await blipImg(fill.blip,L,X);
+    withXfrm(g,t,()=>{ const kind=geomPath(g,sp,t.w,t.h);
+      if(kind!=='line'&&fill){ if(img){ const am=desc(fill.blip,'alphaModFix'); g.save(); g.clip(); g.globalAlpha=am?num(am.getAttribute('amt'),100000)/100000:1; g.drawImage(img,0,0,t.w,t.h); g.restore(); }
+        else if(fill.color){ g.fillStyle=css(fill.color); g.fill(); }
+        else if(fill.grad){ const a=(fill.ang||90)*Math.PI/180; const gr=g.createLinearGradient(t.w/2-Math.cos(a)*t.w/2,t.h/2-Math.sin(a)*t.h/2,t.w/2+Math.cos(a)*t.w/2,t.h/2+Math.sin(a)*t.h/2);
+          fill.grad.forEach(q=>gr.addColorStop(Math.max(0,Math.min(1,q.pos)),css(q.c))); g.fillStyle=gr; g.fill(); } }
+      if(stroke){ g.strokeStyle=css(stroke.col); g.lineWidth=Math.max(stroke.wd,9525*0.5); g.lineJoin='round';
+        g.setLineDash(stroke.dash?(/dot/i.test(stroke.dash)?[stroke.wd,stroke.wd*2]:[stroke.wd*4,stroke.wd*3]):[]); g.stroke(); g.setLineDash([]); } });
+    const tx=kid(sp,'txBody'); if(tx) drawText(g,X,lvl,sp,tx,t,ph,lph,mph,st,s); }
+  async function drawPic(g,X,lvl,pic){ const t=xfrmOf(pic); if(!t) return; const bf=kid(pic,'blipFill'); const im=bf&&await blipImg(bf,X[lvl],X); if(!im) return;
+    const sr=kid(bf,'srcRect'); let sx=0,sy=0,sw=im.naturalWidth,sh=im.naturalHeight;
+    if(sr){ const l=num(sr.getAttribute('l'))/100000, tp=num(sr.getAttribute('t'))/100000, r=num(sr.getAttribute('r'))/100000, b=num(sr.getAttribute('b'))/100000; sx=l*sw; sy=tp*sh; sw=sw*(1-l-r); sh=sh*(1-tp-b); }
+    const am=desc(bf,'alphaModFix'); const alpha=am?num(am.getAttribute('amt'),100000)/100000:1;
+    withXfrm(g,t,()=>{ g.globalAlpha=alpha; try{ g.drawImage(im,sx,sy,Math.max(1,sw),Math.max(1,sh),0,0,t.w,t.h); }catch(e){} g.globalAlpha=1; }); }
+  function drawTable(g,X,lvl,fr){ const tbl=desc(fr,'tbl'); const t=xfrmOf(fr); if(!tbl||!t) return;
+    const cols=kidsN(kid(tbl,'tblGrid'),'gridCol').map(c=>num(c.getAttribute('w'))); let y=t.y;
+    for(const tr of kidsN(tbl,'tr')){ const rh=num(tr.getAttribute('h')); let x=t.x, ci=0; let rowH=rh;
+      const cells=kidsN(tr,'tc');
+      for(const tc of cells){ const span=num(tc.getAttribute('gridSpan'),1); const w=cols.slice(ci,ci+span).reduce((a,b)=>a+b,0); ci+=span;
+        if(tc.getAttribute('hMerge')==='1'||tc.getAttribute('vMerge')==='1'){ x+=w; continue; }
+        const pr=kid(tc,'tcPr'); const f=readFill(pr,X.C); if(f&&f.color){ g.fillStyle=css(f.color); g.fillRect(x,y,w,rh); }
+        let anyB=false; for(const [n,x1,y1,x2,y2] of [['lnL',x,y,x,y+rh],['lnR',x+w,y,x+w,y+rh],['lnT',x,y,x+w,y],['lnB',x,y+rh,x+w,y+rh]]){ const ln=pr&&kid(pr,n); if(!ln||kid(ln,'noFill')) continue; const c=readColor(kid(ln,'solidFill'),X.C); if(!c) continue; anyB=true;
+          g.strokeStyle=css(c); g.lineWidth=num(ln.getAttribute('w'),12700); g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.stroke(); }
+        if(!anyB&&!(f&&f.color)){ g.strokeStyle='rgba(120,130,145,0.6)'; g.lineWidth=9525; g.strokeRect(x,y,w,rh); }
+        const tb=kid(tc,'txBody'); if(tb){ const ins={l:num(pr&&pr.getAttribute('marL'),91440),r:num(pr&&pr.getAttribute('marR'),91440),t:num(pr&&pr.getAttribute('marT'),45720),b:num(pr&&pr.getAttribute('marB'),45720)};
+          const used=drawText(g,X,lvl,null,tb,{x,y,w,h:rh,rot:0},null,null,null,null,0,{ins,anchor:(pr&&pr.getAttribute('anchor'))||'t'}); rowH=Math.max(rowH,used||0); }
+        x+=w; }
+      y+=rowH; } }
+  function styleSources(X,lvl,ph,lph,mph,tx){ const out=[X.defTS];
+    const ts=X.txStyles; const type=ph?(ph.getAttribute('type')||'obj'):null;
+    if(ts) out.push(type==='title'||type==='ctrTitle'?kid(ts,'titleStyle'):type&&type!=='dt'&&type!=='ftr'&&type!=='sldNum'?kid(ts,'bodyStyle'):kid(ts,'otherStyle'));
+    for(const p of [mph,lph]) if(p){ const tb=kid(p,'txBody'); if(tb) out.push(kid(tb,'lstStyle')); }
+    out.push(kid(tx,'lstStyle')); return out.filter(Boolean); }
+  // Lays out and draws a text body; returns the height used (EMU).
+  function drawText(g,X,lvl,sp,tx,t,ph,lph,mph,st,s,opt){ const C=X.C; const id=sp?idOf(sp):null;
+    const bps=[mph,lph].map(p=>p&&path(p,'txBody','bodyPr')).filter(Boolean).concat([kid(tx,'bodyPr')]);
+    const bp={l:91440,r:91440,t:45720,b:45720,anchor:'t',wrap:true,scale:1,lnRed:0};
+    for(const b of bps){ for(const [a,k2] of [['lIns','l'],['rIns','r'],['tIns','t'],['bIns','b']]) if(b.getAttribute(a)!=null) bp[k2]=num(b.getAttribute(a)); if(b.getAttribute('anchor')) bp.anchor=b.getAttribute('anchor'); if(b.getAttribute('wrap')==='none') bp.wrap=false;
+      const na=kid(b,'normAutofit'); if(na){ if(na.getAttribute('fontScale')) bp.scale=num(na.getAttribute('fontScale'))/100000; if(na.getAttribute('lnSpcReduction')) bp.lnRed=num(na.getAttribute('lnSpcReduction'))/100000; } }
+    if(opt){ Object.assign(bp,opt.ins); bp.anchor=opt.anchor; }
+    const U=1/X.k; g.save(); g.scale(U,U); t={...t,x:t.x/U,y:t.y/U,w:t.w/U,h:t.h/U}; bp.l/=U; bp.r/=U; bp.t/=U; bp.b/=U;
+    const srcs=styleSources(X,lvl,ph,lph,mph,tx); const PT=12700/U;
+    const W=t.w-bp.l-bp.r; const paras=kidsN(tx,'p'); const lines=[]; let auto=0;
+    paras.forEach((p,pi)=>{ const pPr=kid(p,'pPr'); const lv=num(pPr&&pPr.getAttribute('lvl'));
+      const P={algn:'l',marL:0,indent:0,lnPct:1,lnPts:null,spcBef:null,spcAft:null,bu:null,r:{sz:18,color:null}};
+      for(const src of srcs) mergeP(P,kid(src,'lvl'+(lv+1)+'pPr'),C); mergeP(P,pPr,C); P.marL/=U; P.indent/=U;
+      const vis=!st||!id||!(id+'#'+pi in st.appear||id+'#'+pi in st.hide)||visibleAt(st,id+'#'+pi,s);
+      const runs=[]; for(const r of p.children){ if(r.localName==='r'||r.localName==='fld'){ const R=deepCopy(P.r||{}); mergeR(R,kid(r,'rPr'),C); let text=(kid(r,'t')||{}).textContent||''; if(R.cap==='all') text=text.toUpperCase(); runs.push({R,text}); }
+        else if(r.localName==='br'){ const R=deepCopy(P.r||{}); mergeR(R,kid(r,'rPr'),C); runs.push({R,text:'\n'}); } }
+      const endR=deepCopy(P.r||{}); mergeR(endR,kid(p,'endParaRPr'),C);
+      const szOf=R=>(R.sz||18)*bp.scale*PT;
+      let maxSz=runs.length?Math.max(...runs.map(r=>szOf(r.R))):szOf(endR);
+      const fontOf=(R,txt)=>`${R.i?'italic ':''}${R.b?'700':'400'} ${szOf(R)}px ${fontStack(DEV.test(txt)?(R.cs||R.latin):R.latin,C)}`;
+      const spB=P.spcBef?(P.spcBef.pts!=null?P.spcBef.pts*PT:P.spcBef.pct*maxSz):0, spA=P.spcAft?(P.spcAft.pts!=null?P.spcAft.pts*PT:P.spcAft.pct*maxSz):0;
+      let bullet=null; if(P.bu&&runs.some(r=>r.text.trim())){ if(P.bu.ch) bullet=P.bu.ch; else if(P.bu.auto){ auto++; bullet=(P.bu.start+auto-1)+(/Paren/.test(P.bu.auto)?')':'.'); } } else auto=0;
+      // tokens → lines
+      let cur={segs:[],w:0,sz:maxSz,x0:P.marL+P.indent}; const avail=()=>W-cur.x0;
+      const pushLine=()=>{ lines.push({...cur,para:pi,P,vis,spB:lines.length&&lines[lines.length-1].para===pi?0:spB}); cur={segs:[],w:0,sz:maxSz,x0:P.marL}; };
+      for(const {R,text} of runs){ if(text==='\n'){ pushLine(); continue; } g.font=fontOf(R,text);
+        for(const tok of text.split(/(\s+)/)){ if(!tok) continue; let w=g.measureText(tok).width;
+          if(bp.wrap&&cur.w+w>avail()&&cur.segs.length&&tok.trim()){ pushLine(); g.font=fontOf(R,text); }
+          if(bp.wrap&&w>avail()&&tok.trim()){ // a single word longer than the line: split by characters
+            let part=''; for(const ch of tok){ const pw=g.measureText(part+ch).width; if(cur.w+pw>avail()&&part){ cur.segs.push({t:part,R,font:g.font,w:g.measureText(part).width}); cur.w+=g.measureText(part).width; pushLine(); g.font=fontOf(R,text); part=ch; } else part+=ch; }
+            w=g.measureText(part).width; cur.segs.push({t:part,R,font:g.font,w}); cur.w+=w; continue; }
+          if(!cur.segs.length&&!tok.trim()) continue; cur.segs.push({t:tok,R,font:g.font,w}); cur.w+=w; } }
+      pushLine(); const last=lines[lines.length-1]; last.spA=spA; lines.filter(l=>l.para===pi)[0].bullet=bullet;
+      for(const l of lines.filter(l=>l.para===pi)){ const lsz=l.segs.length?Math.max(...l.segs.map(q=>szOf(q.R))):maxSz; l.sz=lsz;
+        l.h=P.lnPts!=null?P.lnPts*PT:lsz*1.2*(P.lnPct??1)*(1-bp.lnRed); l.R0=(l.segs[0]&&l.segs[0].R)||endR; } });
+    const total=lines.reduce((a,l)=>a+(l.spB||0)+l.h+(l.spA||0),0);
+    let y=t.y+bp.t; const boxH=t.h-bp.t-bp.b; if(bp.anchor==='ctr') y+= (boxH-total)/2; else if(bp.anchor==='b') y+=boxH-total;
+    g.save(); g.textBaseline='alphabetic';
+    if(t.rot){ g.translate(t.x+t.w/2,t.y+t.h/2); g.rotate(t.rot*Math.PI/180); g.translate(-(t.x+t.w/2),-(t.y+t.h/2)); }
+    for(const l of lines){ y+=l.spB||0; const base=y+l.h*0.5+l.sz*0.36;
+      if(l.vis){ const lw=l.segs.reduce((a,q)=>a+q.w,0); let x=t.x+bp.l+l.x0; const free=W-l.x0-lw;
+        if(l.P.algn==='ctr') x+=free/2; else if(l.P.algn==='r') x+=free;
+        if(l.bullet){ const R=l.R0; g.font=`${(R.sz||18)*bp.scale*PT*(l.P.buSz||1)}px ${fontStack(l.P.buFont||R.latin,C)}`; g.fillStyle=css(l.P.buClr||R.color||[0,0,0,1])||'#000';
+          g.fillText(l.bullet,t.x+bp.l+l.P.marL+l.P.indent,base); }
+        for(const q of l.segs){ g.font=q.font; g.fillStyle=css(q.R.color)||css(readColorScheme(C,'tx1'))||'#000';
+          const by=q.R.base?base-q.R.base*l.sz:base; g.fillText(q.t,x,by);
+          if(q.R.u){ g.fillRect(x,by+l.sz*0.1,q.w,Math.max(PT*0.8,l.sz*0.05)); } x+=q.w; } }
+      y+=l.h+(l.spA||0); }
+    g.restore(); g.restore(); return (total+bp.t+bp.b)*U; }
+  function readColorScheme(C,k){ const v=C.scheme[(C.map&&C.map[k])||k]||'000000'; return [parseInt(v.slice(0,2),16),parseInt(v.slice(2,4),16),parseInt(v.slice(4,6),16),1]; }
+
+  async function importPptx(file){ let res;
+    try{ res=await readPptx(file,(d,n)=>toast('Opening PowerPoint — slide '+d+' of '+n+'…',4000)); }
+    catch(e){ console.error(e); infoCard('This PowerPoint could not be opened','The file may be damaged, password-protected, or an old .ppt. Open it in PowerPoint and save it again as .pptx, then import it here.'); return 0; }
+    if(!res.blobs.length){ toast('No slides found in this file.'); return 0; }
+    const made=placeSlides(res.blobs,res.groups);
+    await ensureBg(S()); repaint(); refreshUndo(); syncNav(); prefetchBg(); schedulePrev();
+    return made.length; }
+
+  if(location.hostname==='localhost') window.__gsbTest={readPptx,parseSteps};
   // ---------- boot ----------
   (async function boot(){
     slides=[makeSlide()]; cur=0; applySize(); ro.observe(stage); await sizedReady;
@@ -1205,7 +1485,7 @@
   #pinGate .c{text-align:center;width:min(380px,92vw)} #pinGate h1{font-size:22px;letter-spacing:.06em;margin:0 0 6px} #pinGate p{color:#9aa1b2;margin:0 0 18px;font-size:14px}
   #pinDots{display:flex;gap:12px;justify-content:center;margin-bottom:18px} #pinDots i{width:16px;height:16px;border-radius:50%;border:2px solid #9aa1b2}
   #pinDots i.f{background:#14b8a6;border-color:#14b8a6} #pinGate.bad #pinDots i{border-color:#e5484d}
-  #pinPad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px} #pinPad button{height:68px;border-radius:14px;border:none;background:#262a36;color:#fff;font-size:26px;cursor:pointer}
+  #pinPad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px} #pinPad button{touch-action:manipulation;-webkit-user-select:none;user-select:none;height:68px;border-radius:14px;border:none;background:#262a36;color:#fff;font-size:26px;cursor:pointer}
   #pinPad button:active{background:#333846}
   body.noclaude .tool[data-tool="writename"]{display:none !important}
 </style>
@@ -1216,10 +1496,22 @@
   let ok=false; try{ ok=localStorage.getItem('gsb_pin')===HASH; }catch(e){}
   if(!ok){ gate.hidden=false; let v='';
     const draw=()=>{ dots.innerHTML=Array.from({length:N},(_,i)=>'<i class="'+(i<v.length?'f':'')+'"></i>').join(''); };
-    const check=async()=>{ const h=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('gsboard:'+v)))).map(b=>b.toString(16).padStart(2,'0')).join('');
+    const sha256=str=>{ const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+      const b=[]; for(const ch of unescape(encodeURIComponent(str))) b.push(ch.charCodeAt(0)); const l=b.length*8; b.push(0x80); while(b.length%64!==56) b.push(0);
+      for(let i=7;i>=0;i--) b.push(i>3?0:(l>>>(i*8))&255);
+      let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]; const r=(x,n)=>(x>>>n)|(x<<(32-n));
+      for(let o=0;o<b.length;o+=64){ const w=[]; for(let i=0;i<16;i++) w[i]=(b[o+4*i]<<24)|(b[o+4*i+1]<<16)|(b[o+4*i+2]<<8)|b[o+4*i+3];
+        for(let i=16;i<64;i++){ const s0=r(w[i-15],7)^r(w[i-15],18)^(w[i-15]>>>3), s1=r(w[i-2],17)^r(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)|0; }
+        let [a,bb,c,d,e,f,g,h]=H;
+        for(let i=0;i<64;i++){ const t1=(h+(r(e,6)^r(e,11)^r(e,25))+((e&f)^(~e&g))+K[i]+w[i])|0, t2=((r(a,2)^r(a,13)^r(a,22))+((a&bb)^(a&c)^(bb&c)))|0; h=g; g=f; f=e; e=(d+t1)|0; d=c; c=bb; bb=a; a=(t1+t2)|0; }
+        H=[H[0]+a,H[1]+bb,H[2]+c,H[3]+d,H[4]+e,H[5]+f,H[6]+g,H[7]+h].map(x=>x|0); }
+      return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join(''); };
+    const check=()=>{ const h=sha256('gsboard:'+v);
       if(h===HASH){ try{ localStorage.setItem('gsb_pin',HASH); }catch(e){} gate.remove(); } else { gate.classList.add('bad'); setTimeout(()=>{ gate.classList.remove('bad'); v=''; draw(); },600); } };
     const press=k=>{ if(k==='⌫') v=v.slice(0,-1); else if(/\d/.test(k)&&v.length<N) v+=k; draw(); if(v.length===N) check(); };
-    ['1','2','3','4','5','6','7','8','9','','0','⌫'].forEach(k=>{ const b=document.createElement('button'); b.textContent=k; if(!k) b.style.visibility='hidden'; b.onclick=()=>press(k); pad.appendChild(b); });
+    let lastUp=0;
+    ['1','2','3','4','5','6','7','8','9','','0','⌫'].forEach(k=>{ const b=document.createElement('button'); b.type='button'; b.textContent=k; if(!k) b.style.visibility='hidden';
+      b.addEventListener('pointerup',e=>{ e.preventDefault(); lastUp=Date.now(); press(k); }); b.addEventListener('click',()=>{ if(Date.now()-lastUp>600) press(k); }); pad.appendChild(b); });
     addEventListener('keydown',e=>{ if(!document.body.contains(gate)) return; if(/^\d$/.test(e.key)||e.key==='Backspace'){ e.stopImmediatePropagation(); e.preventDefault(); press(e.key==='Backspace'?'⌫':e.key); } },true);
     draw(); }
   if('serviceWorker' in navigator&&!window.claude) navigator.serviceWorker.register('sw.js').catch(()=>{});
