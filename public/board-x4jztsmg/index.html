@@ -121,6 +121,13 @@
   #toast.on{ opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
 
   #pred{ z-index:3; pointer-events:none; }
+  #penTest{ position:fixed; inset:0; z-index:90; background:#fbfbf8; display:none; touch-action:none; }
+  #penTest.on{ display:block; }
+  #ptCv{ position:absolute; inset:0; width:100%; height:100%; touch-action:none; }
+  #ptInfo{ position:absolute; left:16px; top:16px; background:#1b1e27; color:#e8eaf0; border-radius:14px; padding:14px 16px; font:15px/1.5 ui-monospace,Menlo,monospace; max-width:min(560px,92vw); pointer-events:none; white-space:pre-wrap; }
+  #ptCtl{ position:absolute; right:16px; top:16px; display:flex; gap:8px; align-items:center; background:#1b1e27; color:#e8eaf0; border-radius:14px; padding:10px 12px; font-size:14px; }
+  #ptCtl button{ border:none; border-radius:10px; min-height:44px; padding:0 14px; background:#262a36; color:#fff; font-size:15px; cursor:pointer; }
+  #ptCtl input{ width:160px; accent-color:#14b8a6; }
   #findBox{ position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:46; display:none; flex-direction:column; gap:8px; width:min(620px,calc(100vw - 24px));
     background:var(--bar); color:var(--txt); border:1px solid var(--bar-line); border-radius:16px; box-shadow:var(--shadow); padding:10px; }
   #findBox.on{ display:flex; }
@@ -233,6 +240,7 @@
   <p class="tray-h">Thickness</p>
   <div class="sizeRow"><span id="sizeDot"><i></i></span><input type="range" id="size" min="1" max="60" value="6" aria-label="Thickness"><span id="sizeVal">6</span></div>
   <div class="toggleRow"><span>Finger draws (off = finger pans, palm still erases)</span><button class="switch" id="fingerDraw" aria-pressed="true"><b></b></button></div>
+  <div class="toggleRow"><span>Pen test: see what the panel sends (pen tip, back tip, finger, palm)</span><button class="ghost2" id="penTestBtn" style="border:none;border-radius:10px;padding:10px 16px;background:var(--bar-hi);color:var(--txt);cursor:pointer;font-weight:600">Open</button></div>
 </div>
 
 <div id="boardTray" class="pop" role="dialog" aria-label="Board settings">
@@ -305,6 +313,8 @@
   <div class="bd"><div id="tRows"></div><div id="tPrevWrap"><img id="tPrev" alt="Tree preview"></div></div>
   <div class="ft"><button id="tCancel">Cancel</button><button id="tPlace" class="go">Place on board</button></div>
 </div></div>
+<div id="penTest"><canvas id="ptCv"></canvas><pre id="ptInfo">Touch the board with the pen tip, the back tip, a finger and your palm.</pre>
+  <div id="ptCtl">Palm if wider than <input type="range" id="ptPalm" min="10" max="300"><b id="ptPalmV"></b>px <button id="ptClear">Clear</button><button id="ptClose">Close</button></div></div>
 <div class="scrim" id="scrim"><div class="card" id="card"></div></div>
 <div id="toast"></div>
 
@@ -325,7 +335,7 @@
     {c:'#123b2e',dark:true},{c:'#16181d',dark:true},{c:'#0f2438',dark:true}];
   const board={ color:'#ffffff', dark:false, grid:false, watermark:true };
   const state={ tool:'pen', color:'#111317', size:6, fingerDraws:true };
-  const TOUCH_PALM_PX=42; const MAXUNDO=10;
+  let TOUCH_PALM_PX=42; try{ const v=+localStorage.getItem('gsb_palm'); if(v>=10&&v<=400) TOUCH_PALM_PX=v; }catch(e){} const MAXUNDO=10;
 
   // ---------- slides ----------
   let slides=[], cur=0;
@@ -455,7 +465,7 @@
       pointers.delete(e.pointerId); clearPred(); if(pointers.size===0){ scheduleSave(); scheduleThumb(); schedulePrev(); } }
     if(e.pointerType==='pen') penActive=[...pointers.values()].some(s=>s._pen); }
 
-  vis.addEventListener('pointerdown',e=>{ vis.setPointerCapture(e.pointerId); rect=vis.getBoundingClientRect();
+  vis.addEventListener('pointerdown',e=>{ try{ vis.setPointerCapture(e.pointerId); }catch(_){} rect=vis.getBoundingClientRect();
     if(state.tool==='move'){ if(S().item) gestStart(e); else toast('Add a map or diagram from the Library first'); return; }
     const isPen=e.pointerType==='pen'; const contact=Math.max(e.width||0,e.height||0); const isPalm=e.pointerType==='touch'&&contact>=TOUCH_PALM_PX;
     const penErase=isPen&&(e.button===5||e.buttons===32||e.button===2);
@@ -463,9 +473,8 @@
     if(penActive) return;
     if(isPalm){ if(pointers.size===0)snapshot(); begin(e,true); return; }
     if(state.fingerDraws){ if(pointers.size===0)snapshot(); begin(e,false); } });
-  const MOVE_EV=('onpointerrawupdate' in window)?'pointerrawupdate':'pointermove';
-  vis.addEventListener(MOVE_EV,e=>{ if(pointers.has(e.pointerId)) extend(e); },{passive:true});
-  vis.addEventListener('pointermove',e=>{ if(gest.has(e.pointerId)) gestMove(e); },{passive:true});
+  vis.addEventListener('pointerrawupdate',e=>{ const st=pointers.get(e.pointerId); if(st){ st.raw=true; extend(e); } },{passive:true});
+  vis.addEventListener('pointermove',e=>{ if(gest.has(e.pointerId)){ gestMove(e); return; } const st=pointers.get(e.pointerId); if(st&&!st.raw) extend(e); },{passive:true});
   ['pointerup','pointercancel','pointerleave','pointerout'].forEach(t=>vis.addEventListener(t,end));
 
   // ---------- slide navigation ----------
@@ -513,7 +522,7 @@
       else { skipped++; }
     }
     if(added) toast(added+' slide'+(added>1?'s':'')+' added');
-    if(skipped) toast('PowerPoint files cannot be opened here yet. Export the deck as PDF and import that.',5200);
+    if(skipped) infoCard('PowerPoint needs one step on the Mac','A .pptx cannot be opened on the board directly. On your Mac, double-click “PPT to Board” in the gyrus-board folder and choose the PowerPoint. It makes a file ending in “- board.pdf” in the lessons folder. Copy that file to the panel and import it here, then tap Present.');
     buildStrip(); strip.classList.add('open'); scheduleSave(true);
   };
   let pdfLib=null;
@@ -1156,6 +1165,28 @@
     await rasterize(s); repaint(); syncDbar(); scheduleSave(true); scheduleThumb(); };
   document.getElementById('dEdit').onclick=()=>{ const s=S(); if(s.item&&s.item.key==='tree') openTree(s); };
 
+  function infoCard(title,text){ card.innerHTML=`<h3>${escH(title)}</h3><p>${escH(text)}</p><div class="row"><button class="primary" id="icOk">OK</button></div>`;
+    scrim.classList.add('open'); card.querySelector('#icOk').onclick=()=>scrim.classList.remove('open'); }
+  // ---------- pen test ----------
+  (()=>{ const box=document.getElementById('penTest'), cv=document.getElementById('ptCv'), info=document.getElementById('ptInfo'), palm=document.getElementById('ptPalm'), pv=document.getElementById('ptPalmV');
+    let cx=null, cnt={down:0,move:0,raw:0}, last={}, t0=performance.now();
+    const size=()=>{ const d=Math.min(devicePixelRatio||1,2); cv.width=innerWidth*d; cv.height=innerHeight*d; cx=cv.getContext('2d'); cx.setTransform(d,0,0,d,0,0); };
+    document.getElementById('penTestBtn').onclick=()=>{ closePops(); box.classList.add('on'); size(); palm.value=TOUCH_PALM_PX; pv.textContent=TOUCH_PALM_PX; cnt={down:0,move:0,raw:0}; t0=performance.now(); };
+    document.getElementById('ptClose').onclick=()=>box.classList.remove('on');
+    document.getElementById('ptClear').onclick=()=>{ cx&&cx.clearRect(0,0,cv.width,cv.height); };
+    palm.oninput=()=>{ TOUCH_PALM_PX=+palm.value; pv.textContent=palm.value; try{ localStorage.setItem('gsb_palm',palm.value); }catch(e){} show(); };
+    const COL={pen:'#1c53e8',touch:'#14a08f',mouse:'#e39b12'};
+    function show(){ const e=last; if(!e.type) return; const c=Math.max(e.w,e.h); const secs=Math.max(1,(performance.now()-t0)/1000);
+      const verdict=e.pt==='pen'?'PEN → draws':e.pt==='touch'?(c>=TOUCH_PALM_PX?'TOUCH, wide → PALM ERASER':'TOUCH, narrow → draws'):e.pt.toUpperCase();
+      info.textContent=`type      ${e.pt}\nsize      ${e.w.toFixed(1)} × ${e.h.toFixed(1)} px   (palm if ≥ ${TOUCH_PALM_PX})\npressure  ${e.p.toFixed(2)}\nbutton    ${e.b} / buttons ${e.bs}\ntilt      ${e.tx}, ${e.ty}\nresult    ${verdict}\nevents    down ${cnt.down} · move ${cnt.move} · raw ${cnt.raw}\nrate      move ${(cnt.move/secs).toFixed(0)}/s · raw ${(cnt.raw/secs).toFixed(0)}/s\nscreen    ${innerWidth}×${innerHeight} css px · dpr ${devicePixelRatio}\nbrowser   ${navigator.userAgent.replace(/.*(Chrome\/[\d.]+|Version\/[\d.]+|Firefox\/[\d.]+).*/,'$1')}`; }
+    const rec=(e,type)=>{ last={type,pt:e.pointerType||'?',w:e.width||0,h:e.height||0,p:e.pressure||0,b:e.button,bs:e.buttons,tx:e.tiltX||0,ty:e.tiltY||0};
+      if(cx&&(type!=='up')&&(e.buttons||type==='down')){ const c=Math.max(last.w,last.h); cx.fillStyle=COL[last.pt]||'#d9486f'; cx.globalAlpha=last.pt==='touch'&&c>=TOUCH_PALM_PX?0.25:0.85;
+        cx.beginPath(); cx.arc(e.clientX,e.clientY,Math.max(2.5,Math.min(60,c/2)),0,7); cx.fill(); cx.globalAlpha=1; } show(); };
+    cv.addEventListener('pointerdown',e=>{ try{ cv.setPointerCapture(e.pointerId); }catch(_){} cnt.down++; rec(e,'down'); });
+    cv.addEventListener('pointermove',e=>{ cnt.move++; rec(e,'move'); },{passive:true});
+    cv.addEventListener('pointerrawupdate',e=>{ cnt.raw++; },{passive:true});
+    cv.addEventListener('pointerup',e=>rec(e,'up'));
+    addEventListener('resize',()=>{ if(box.classList.contains('on')) size(); }); })();
   // ---------- boot ----------
   (async function boot(){
     slides=[makeSlide()]; cur=0; applySize(); ro.observe(stage); await sizedReady;
